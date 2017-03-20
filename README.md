@@ -2,6 +2,21 @@
 misc PoC 
 
 DAHUA
+---
+
+2017-03-20
+
+With my newfound knowledge of vulnerable devices out there with an unbelievable number of more than 1 million Dahua / OEM units, where knowledge comes from a report made by NSFOCUS and my own research on shodan.io.
+
+With this knowledge, I will not release the Python PoC to the public as before said of April 5, as it is not necessary when the PoC has already been verified by IPVM and other independent security researchers.
+
+However, I'm open to share the PoC with serious security researchers if so desired, please e-mail me off list and be clear about who you are so I do not take you for a beggar, which I ignore.
+
+NSFOCUS report: http://blog.nsfocus.net/dahua-cameras-unauthorized-access-vulnerability-technical-analysis-solution/
+
+/bashis
+
+---
 
 Did you notice the date and time stamps on Dahua's patches?
 Check the screen shots from
