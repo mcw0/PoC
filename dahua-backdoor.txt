@@ -1,3 +1,8 @@
+2017-05-03
+
+Public rerelease of Dahua Backdoor PoC
+https://github.com/mcw0/PoC/blob/master/dahua-backdoor-PoC.py
+
 2017-03-20
 
 With my newfound knowledge of vulnerable devices out there with an unbelievable number of more than 1 million Dahua / OEM units, where knowledge comes from a report made by NSFOCUS and my own research on shodan.io.
