@@ -6,6 +6,7 @@ DAHUA
 2017-05-03
 
 Public rerelease of Dahua Backdoor PoC
+https://github.com/mcw0/PoC/blob/master/dahua-backdoor-PoC.py
 
 2017-03-20
 
