@@ -3,6 +3,10 @@ misc PoC
 
 DAHUA
 ---
+2017-10-17
+Enable / Disable Telnetd in Dahua (for newer firmware versions)
+https://github.com/mcw0/PoC/blob/master/dahua-telnetd-json.py
+
 2017-05-03
 
 Public rerelease of Dahua Backdoor PoC
