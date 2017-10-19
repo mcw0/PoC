@@ -1,6 +1,12 @@
 # PoC
 misc PoC 
 
+Axis
+---
+2017-10-19
+One old forgotten fuzzing back in Q3/2016 that lead to RCE (PoC: Remote connect back shll) and remote read of /etc/shadow.
+Reported to Axis and fixed in Q3/2016, still posting here now as it may be good hint.
+
 DAHUA
 ---
 2017-10-17
