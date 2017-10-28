@@ -4,9 +4,7 @@ misc PoC
 Uniview
 ---
 2017-10-29
-Subject: Uniview RCE and export config PoC
-Attack Vector: Remote
-Authentication: Anonymous (no credentials needed)
+Uniview RCE and export config PoC
 
 Axis
 ---
