@@ -1,21 +1,30 @@
 # PoC
 misc PoC 
 
+Stunnel
+---
+2017-11-13
+Reverse stunnel TLSv1 privacy shell
+https://github.com/mcw0/PoC/blob/master/Reverse%20stunnel%20TLSv1%20privacy%20shell.txt
+
 Vivotek
 ---
 2017-11-13
 Vivotek IP Cameras - Remote Stack Overflow
+https://github.com/mcw0/PoC/blob/master/Vivotek%20IP%20Cameras%20-%20Remote%20Stack%20Overflow.txt
 
 Uniview
 ---
 2017-10-29
 Uniview RCE and export config PoC
+https://github.com/mcw0/PoC/blob/master/Uniview%20RCE%20PoC.txt
 
 Axis
 ---
 2017-10-19
 One old forgotten fuzzing back in Q3/2016 that lead to RCE (PoC: Remote connect back shell) and remote read of /etc/shadow.
 Reported to Axis and fixed in Q3/2016, still posting here now as it may be good hint.
+https://github.com/mcw0/PoC/blob/master/Axis%20SSI%20RCE
 
 DAHUA
 ---
