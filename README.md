@@ -1,14 +1,16 @@
 # PoC
 misc PoC
 
-2017-12-14
----
 Remote Stack Format String in 'nsd' binary from multiple OEM (0-day)
+---
+2017-12-14
+
 https://github.com/mcw0/PoC/blob/master/Remote_Stack_Format_String_multiple%20OEM.txt
 
-2017-12-05
----
 non-crashing Format String Backdoor Proof of Concept
+---
+2017-12-05
+
 https://github.com/mcw0/PoC/blob/master/tiny-w3-mcw.c
 
 Vicon Security RCE (authenticated)
