@@ -6,8 +6,8 @@ misc PoC
 Remote Stack Format String in 'nsd' binary from multiple OEM (0-day)
 https://github.com/mcw0/PoC/blob/master/Remote_Stack_Format_String_multiple%20OEM.txt
 
----
 2017-12-05
+---
 non-crashing Format String Backdoor Proof of Concept
 https://github.com/mcw0/PoC/blob/master/tiny-w3-mcw.c
 
