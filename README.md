@@ -1,6 +1,12 @@
 # PoC
 misc PoC
 
+Vitek RCE and Information Disclosure (and possible other OEM) 0-day
+---
+2017-12-22
+
+https://github.com/mcw0/PoC/blob/master/Vitek_RCE_and_information_disclosure.txt
+
 Remote Stack Format String in 'nsd' binary from multiple OEM (0-day)
 ---
 2017-12-14
