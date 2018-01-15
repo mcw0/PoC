@@ -1,6 +1,16 @@
 # PoC
 misc PoC
 
+Foscam
+---
+2018-01-15
+
+Small OpenSSL wrapper to looping different encryption keys/digest and cipher on Foscam IPC Firmware images.
+https://github.com/mcw0/PoC/blob/master/decrypt-foscam.py
+
+Deobfuscate strings/login/password/cryptokey in misc Foscam IPC binaries and libs
+https://github.com/mcw0/PoC/blob/master/deobfuscate-foscam.py
+
 Vitek RCE and Information Disclosure (and possible other OEM) 0-day
 ---
 2017-12-22
