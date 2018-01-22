@@ -1,6 +1,14 @@
 # PoC
 misc PoC
 
+Herospeed
+---
+2018-01-22
+
+Herospeed TelnetSwitch daemon running on TCP/787, for allowing enable of the telnetd.
+Where one small stack overflow allows us to overwrite the dynamicly generated password and enable telnetd.
+https://github.com/mcw0/PoC/blob/master/Herospeed-TelnetSwitch.py
+
 Foscam
 ---
 2018-01-15
