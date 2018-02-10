@@ -1,6 +1,8 @@
 
 // bashis <mcw noemail eu> 2017
-
+#
+# Used in https://github.com/mcw0/PoC/blob/master/Geovision-PoC.py
+#
 Reverse stunnel TLSv1 privacy shell
 
 [RHOST]
