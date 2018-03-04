@@ -1,6 +1,14 @@
 # PoC
 misc PoC
 
+AVTECH
+---
+2018-03-05
+
+AVTECH {DVR/NVR/IPC} Authenticated RCE
+
+https://github.com/mcw0/PoC/blob/master/AVTECH-RCE.py
+
 Geovision Inc.
 ---
 2018-02-01
