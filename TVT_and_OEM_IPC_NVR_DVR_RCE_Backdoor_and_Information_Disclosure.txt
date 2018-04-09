@@ -33,6 +33,7 @@ January 11, 2018: SSD replied back that they had established contact with TVT, a
 February 13, 2018: Pinged SSD for update - no reply.
 February 19, 2018: Understood that main PoC at SSD no longer working for SSD.
 February 19, 2018: Noticed that some OEM released updated firmware; Stack Overflow not fixed. Updated SSD with findings.
+April 3, 2018: Vendor released advisory http://en.tvt.net.cn/news/227.html
 April 9, 2018: Full Disclosure
 
 
