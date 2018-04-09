@@ -1,6 +1,15 @@
 # PoC
 misc PoC
 
+Shenzhen TVT Digital Technology Co. Ltd
+---
+2018-04-09
+
+Shenzhen TVT Digital Technology Co. Ltd & OEM {DVR/NVR/IPC} API RCE
+https://github.com/mcw0/PoC/blob/master/TVT_and_OEM_IPC_NVR_DVR_RCE_Backdoor_and_Information_Disclosure.txt
+https://github.com/mcw0/PoC/blob/master/TVT-PoC.py
+
+
 AVTECH
 ---
 2018-03-05
