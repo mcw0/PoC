@@ -1,6 +1,9 @@
 # PoC
 misc PoC - Internet of (In)Security Things
 
+Well worth to read about these crappy (in)security things:
+https://ipvm.com/reports/security-exploits
+
 Shenzhen TVT Digital Technology Co. Ltd
 ---
 2018-04-09
