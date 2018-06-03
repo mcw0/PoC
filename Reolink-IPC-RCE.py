@@ -184,7 +184,7 @@ if __name__ == "__main__":
 	verbose = False
 	noexploit = False
 	raw_request = True
-	credentials = "admin:"	# Default l/p
+	credentials = "admin:123456"	# Default l/p
 #	credentials = None
 
 	headers = {
