@@ -4,6 +4,17 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+AVTECH Corporation
+---
+2018-06-18
+
+AVTECH {DVR/NVR/IPC} Heap Overflow, IPCP API, RCE
+
+https://github.com/mcw0/PoC/blob/master/Avtech_Undocumented_API_and_RCE.txt
+
+https://github.com/mcw0/PoC/blob/master/AVTECH-IPCP-RCE.py
+
+
 Reolink Digital Technology Co., Ltd.
 ---
 2018-06-03
