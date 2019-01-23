@@ -4,6 +4,21 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+VDOO
+---
+2019-01-23
+
+Greetings, long time and no publish ...
+
+I am still around and doing my research, but the news is that I also try to work with VDOO (https://www.vdoo.com/) for vendor management, and this has unfortunately delayed my Full Disclosure process somewhat ...
+
+Anyway, several interesting researches coming up as Full Disclosure here on my GitHub.
+
+With the collaboration with VDOO I can work with that I like to do, and not waste time with the vendors who do (not want | don't understand | want to ignore | want to delay | whatever).
+
+The latest are some Reolink (https://reolink.com/) stuff, which you will find here: https://www.vdoo.com/blog/working-with-the-community-%E2%80%93-significant-vulnerabilities-in-reolink-cameras/.
+
+
 AVTECH Corporation
 ---
 2018-06-18
