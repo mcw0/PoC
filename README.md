@@ -12,6 +12,8 @@ This script will use Dahua 'DHIP' P2P binary protocol, that works on normal HTTP
 
 Will attach to Dahua devices internal 'Debug Console' using JSON (same type as the former debug on TCP/6789) 
 
+https://github.com/mcw0/PoC/blob/master/Dahua-DHIP-JSON-Debug-Console.py
+
 Have fun, bashis
 
 
