@@ -4,6 +4,17 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+Dahua DHIP JSON Debug Console (authenticated)
+---
+2019-04-10
+
+This script will use Dahua 'DHIP' P2P binary protocol, that works on normal HTTP/HTTPS ports and TCP/5000
+
+Will attach to Dahua devices internal 'Debug Console' using JSON (same type as the former debug on TCP/6789) 
+
+Have fun, bashis
+
+
 VDOO
 ---
 2019-01-23
