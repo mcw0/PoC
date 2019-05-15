@@ -4,6 +4,14 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+LifeSafety Power
+---
+2019-05-15
+
+Multiple Stack Overflow, RCE, disclosure username/password in clear text and more
+
+https://github.com/mcw0/PoC/blob/master/LifeSafetyPower-Netlink-PoC.py
+
 Dahua DHIP JSON Debug Console (authenticated)
 ---
 2019-04-10
