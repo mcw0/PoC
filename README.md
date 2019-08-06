@@ -4,6 +4,15 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+Several vulnerabilities in multiple network switches
+---
+2019-08-06
+
+https://www.vdoo.com/blog/disclosing-significant-vulnerabilities-network-switches
+
+All technical details along with python PoC will be posted here August 20, 2019.
+
+
 LifeSafety Power
 ---
 2019-05-15
