@@ -4,6 +4,12 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+Realtek Managed Switch Controller (RTL83xx) PoC
+---
+2019-08-20
+
+https://github.com/mcw0/PoC/blob/master/Realtek-RTL83xx-PoC.py
+
 Several vulnerabilities in multiple network switches
 ---
 2019-08-06
