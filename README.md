@@ -4,6 +4,15 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+Axis Communications
+---
+2019-10-06 (old stuff)
+
+Anonymously detect Model and Firmware version of Axis devices (1998 - 2019).
+
+https://github.com/mcw0/PoC/blob/master/axis-detect.py
+
+
 Realtek Managed Switch Controller (RTL83xx) PoC
 ---
 2019-08-20
