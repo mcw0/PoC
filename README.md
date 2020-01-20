@@ -4,6 +4,23 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+Tools
+---
+2020-01-20
+
+New repository created where I plan to push some tools.
+
+https://github.com/mcw0/Tools
+
+First out: Dahua-JSON-Debug-Console-v2.py
+- Ported to Python 3
+- Fixed some bugs and code adjustment
+- Added support for DVRIP (TCP/37777) [Note: Some JSON commands that working with DHIP return nothing with DVRIP]
+- encode/decode in latin-1, we might need untouched chars between 0x00 - 0xff
+- Better 'debug' with hexdump as option
+
+
+
 Axis Communications
 ---
 2019-10-06 (old stuff)
