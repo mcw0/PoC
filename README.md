@@ -4,6 +4,12 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+Few hours ago
+---
+2020-02-10
+
+I've just disclosed creadentials leaks (ending up in clear text) from Dahua SDK to Dahua PSIRT, let see how they will take this information. Pretty bad when there is +20 different cloud providers involved... 90 days ticking from today.
+
 Tools
 ---
 2020-01-20
