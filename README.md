@@ -4,6 +4,17 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+Update
+---
+2020-02-15
+
+Contact established during this week with Dahua PSIRT, details, PoC and proof for 23 different cloud suppliers has been provided. I will also follow the new trial of Google Zero 'Policy and Disclosure: 2020 Edition' (as it make sense to me), meaning I will publish after 90 days, regardless if Dahua would release updates before or after 09.05.2020 19:00 UTC (May 9, 2020 19:00 UTC).
+
+Dahua, please fix and make updates available before this date...
+
+Reference: Google Zero 'Policy and Disclosure: 2020 Edition': https://googleprojectzero.blogspot.com/2020/01/policy-and-disclosure-2020-edition.html
+
+
 Few hours ago
 ---
 2020-02-10
