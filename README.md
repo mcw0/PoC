@@ -4,6 +4,19 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+Dahua DES/3DES encrypt/decrypt, NetSDK credentials leaks, Cloud keys/passwords, DHP2P PoC
+---
+2020-05-09
+
+- Dahua DES/3DES (broken) authentication implementation and PSK
+- Vulnerability: Dahua NetSDK leaking credentials (first 8 chars) from all clients in REALM request when using DVRIP and DHP2P protocol
+- PoC: Added simple TCP/37777 DVRIP listener to display decrypted credentials in clear text
+- Vulnerability: Dahua DHP2P Cloud protocol credentials leakage
+- Vulnerability: Hardcoded DHP2P Cloud keys/passwords for 23 different providers
+- PoC: Access to devices within DHP2P Cloud. PoC only made for Dahua IMOU
+
+https://github.com/mcw0/PoC/blob/master/Dahua-3DES-IMOU-PoC.py
+
 Update: Dahua-JSON-Debug-Console-v2.py
 ---
 2020-02-29
