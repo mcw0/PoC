@@ -189,8 +189,7 @@ if __name__ == "__main__":
 				p = subprocess.Popen(TEMP, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 				p_stderr = p.stderr.readlines()
 #				print "Executing " + TEMP + " result: " + " ".join(p_stderr)
-
-				if not len(p_stderr) or not ( 'bad dycrypt' in str(p_stderr)):
+				if not len(p_stderr) or not ( 'bad decrypt' in str(p_stderr)):
 					p = subprocess.Popen("gzip -t " + outfile + "", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 					p_stderr = p.stderr.read()
 					if not (p_stderr):
