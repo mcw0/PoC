@@ -37,7 +37,6 @@ if __name__ == "__main__":
 	# Firmware, Config and log keys
 	#
 	# >> Missing keys!
-	# 'F' model AKA R4, R2, C2
 	# 
 	# 
 	ENC_KEYS = { 
@@ -91,7 +90,8 @@ if __name__ == "__main__":
 		38:'BpP+2R9*Q',	# exist (config) - encrypt/decrypt
 		39:'Ak47@99',	# l: factory~, p: Ak47@99 @ webService
 		40:'rizhi6789', # dd if=ipcLog.bin | openssl des3 -d -k rizhi6789 [...]
-		41:'foscam'	# l: admin, p: foscam @ UDTMediaServer
+		41:'foscam',	# l: admin, p: foscam @ UDTMediaServer
+		42:'WWzift*v4'  # 'F' model AKA R4, R2, C2
 		}
 
 	CIPHER = {
@@ -188,7 +188,9 @@ if __name__ == "__main__":
 
 				p = subprocess.Popen(TEMP, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 				p_stderr = p.stderr.readlines()
-				if not len(p_stderr):
+#				print "Executing " + TEMP + " result: " + " ".join(p_stderr)
+
+				if not len(p_stderr) or not ( 'bad dycrypt' in str(p_stderr)):
 					p = subprocess.Popen("gzip -t " + outfile + "", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 					p_stderr = p.stderr.read()
 					if not (p_stderr):
@@ -202,10 +204,3 @@ if __name__ == "__main__":
 	print "Cleaning up..."
 	os.remove(outfile)
 	sys.exit(1)
-
-
-
-
-
-
-
