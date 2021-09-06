@@ -4,6 +4,18 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+Dahua CVE-2021-33044, CVE-2021-33045
+---
+2021-09-06
+ 
+Two independent authentication bypass.
+ 
+Due to the very high potential of another "Dahua mass hack", I will keep Full Disclosure details until October 6, 2021.
+ 
+Highly recommend upgrading the firmware until then.
+ 
+https://www.dahuasecurity.com/support/cybersecurity/details/957
+
 Dahua DES/3DES encrypt/decrypt, NetSDK credentials leaks, Cloud keys/passwords, DHP2P PoC
 ---
 2020-05-09
