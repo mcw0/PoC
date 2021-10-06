@@ -6,6 +6,12 @@ https://ipvm.com/reports/security-exploits
 
 Dahua CVE-2021-33044, CVE-2021-33045
 ---
+2021-10-06
+
+Details: https://github.com/mcw0/PoC/blob/master/Dahua%20authentication%20bypass.txt
+
+PoC: https://github.com/mcw0/DahuaConsole
+
 2021-09-06
  
 Two independent authentication bypass.
