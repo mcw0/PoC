@@ -4,6 +4,14 @@ misc PoC - Internet of (In)Security Things
 Well worth to read about these crappy (in)security things:
 https://ipvm.com/reports/security-exploits
 
+Hikvision CVE-2021-36260
+---
+2021-10-19
+
+All credit to Watchful_IP (https://watchfulip.github.io/)
+
+https://github.com/mcw0/PoC/blob/master/CVE-2021-36260.py
+
 Dahua CVE-2021-33044, CVE-2021-33045
 ---
 2021-10-06
