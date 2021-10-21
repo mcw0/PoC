@@ -51,6 +51,7 @@ Device Type: Dahua IPC-HDBW1320E-W
 System Version: 2.400.0000000.16.R, Build Date: 2017-08-31
 
 """
+from __future__ import print_function
 
 import sys
 import json
@@ -69,22 +70,22 @@ def DEBUG(direction, packet):
 	if debug:
 
 		# Print send/recv data and current line number
-		print "[BEGIN {}] <{:-^60}>".format(direction, inspect.currentframe().f_back.f_lineno)
+		print("[BEGIN {}] <{:-^60}>".format(direction, inspect.currentframe().f_back.f_lineno))
 		if packet[0:8] == p64(0x2000000044484950,endian='big'):  # DHIP
 			header = packet[0:32]
 			data = packet[32:]
 
 			if header[0:8] == p64(0x2000000044484950,endian='big'): # DHIP
-				print "\n-HEADER-  -DHIP-  SessionID   ID      LEN               LEN"
-			print "{}|{}|{}|{}|{}|{}|{}|{}".format(
+				print("\n-HEADER-  -DHIP-  SessionID   ID      LEN               LEN")
+			print("{}|{}|{}|{}|{}|{}|{}|{}".format(
 				header[0:4].encode('hex'),header[4:8].encode('hex'),header[8:12].encode('hex'),
 				header[12:16].encode('hex'),header[16:20].encode('hex'),header[20:24].encode('hex'),
-				header[24:28].encode('hex'),header[28:32].encode('hex'))
+				header[24:28].encode('hex'),header[28:32].encode('hex')))
 			if data:
-				print "{}\n".format(data)
+				print("{}\n".format(data))
 		elif packet:
-				print "\n{}\n".format(packet)
-		print "[ END  {}] <{:-^60}>".format(direction, inspect.currentframe().f_back.f_lineno)
+				print("\n{}\n".format(packet))
+		print("[ END  {}] <{:-^60}>".format(direction, inspect.currentframe().f_back.f_lineno))
 	return
 
 #
@@ -565,7 +566,7 @@ class Dahua_Functions:
 				return False
 
 			for paramscount in range(0,int(paramsinfo.get('Count'))):
-				print str(paramsinfo.get('Data')[paramscount]).strip('\n')
+				print(str(paramsinfo.get('Data')[paramscount]).strip('\n'))
 			return True
 
 		elif not data.get('result'):
@@ -656,7 +657,7 @@ class Dahua_Functions:
 		result.pop('id')
 		result.pop('session')
 		result.pop('result')
-		print json.dumps(result,indent=4)
+		print(json.dumps(result,indent=4))
 
 		return
 
@@ -745,7 +746,7 @@ class Dahua_Functions:
 				log.info("Remote Services ({}):".format(len(result['params']['service'])))
 			for count in range(0,len(result['params']['service'])):
 				if len(cmd) == 1 or len(cmd) == 2 and cmd[1] == 'all':
-					print "{}".format(result['params']['service'][count])
+					print("{}".format(result['params']['service'][count]))
 
 				if len(cmd) == 2 and cmd[1] == 'all':
 
@@ -766,7 +767,7 @@ class Dahua_Functions:
 							result2.pop('result')
 							result2.pop('id')
 							result2.pop('session')
-							print json.dumps(result2,indent=4)
+							print(json.dumps(result2,indent=4))
 
 				elif len(cmd) == 2 and cmd[1] == result['params']['service'][count]:
 					log.success("methods for service: {}".format(cmd[1]))
@@ -784,7 +785,7 @@ class Dahua_Functions:
 					if result2.get('result'):
 						result2.pop('id')
 						result2.pop('session')
-						print json.dumps(result2,indent=4)
+						print(json.dumps(result2,indent=4))
 
 
 			return True
@@ -972,7 +973,7 @@ class Dahua_Functions:
 				"id":self.ID
 				}
 			if cmd[1] == 'show':
-				print json.dumps(query_args,indent=4)
+				print(json.dumps(query_args,indent=4))
 				return
 
 
@@ -982,7 +983,7 @@ class Dahua_Functions:
 			if not LEN:
 				return
 			result = json.loads(result)
-			print json.dumps(result,indent=4)
+			print(json.dumps(result,indent=4))
 
 		elif cmd[1] == 'get':
 			query_args = {
@@ -1001,7 +1002,7 @@ class Dahua_Functions:
 				return
 
 			result = json.loads(result)
-			print json.dumps(result,indent=4)
+			print(json.dumps(result,indent=4))
 
 		elif cmd[1] == 'del':
 			query_args = {
@@ -1020,7 +1021,7 @@ class Dahua_Functions:
 				return
 
 			result = json.loads(result)
-			print json.dumps(result,indent=4)
+			print(json.dumps(result,indent=4))
 
 		else:
 			log.failure("Usage: show / set / get / del")
@@ -1110,7 +1111,7 @@ if __name__ == '__main__':
 		arg_parser.add_argument('-f','--force', required=False, default=False, action='store_true', help='Force [Default: False]')
 		args = arg_parser.parse_args()
 	except Exception as e:
-		print INFO,"\nError: {}\n".format(str(e))
+		print(INFO,"\nError: {}\n".format(str(e)))
 		sys.exit(1)
 
 	# We want at least one argument, so print out help

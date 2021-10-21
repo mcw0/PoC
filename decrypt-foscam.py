@@ -4,6 +4,7 @@
 #
 # //bashis 2018
 #
+from __future__ import print_function
 import os
 import subprocess
 import sys
@@ -23,7 +24,7 @@ if __name__ == "__main__":
 		arg_parser.add_argument('--outfile', required=False, help='Decrypted file')
 		args = arg_parser.parse_args()
 	except Exception as e:
-		print INFO,"\nError: %s\n" % str(e)
+		print(INFO,"\nError: %s\n" % str(e))
 		sys.exit(1)
 
 	if args.infile:
@@ -193,13 +194,13 @@ if __name__ == "__main__":
 					p = subprocess.Popen("gzip -t " + outfile + "", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 					p_stderr = p.stderr.read()
 					if not (p_stderr):
-						print "Decrypted with: {}".format(TEMP)
+						print("Decrypted with: {}".format(TEMP))
 						sys.exit(0)
 					else:
-						print "Decryption NOT OK: {}".format(TEMP)
+						print("Decryption NOT OK: {}".format(TEMP))
 						os.remove(outfile)
 				else:
-					print p_stderr[0],
-	print "Cleaning up..."
+					print(p_stderr[0], end=' ')
+	print("Cleaning up...")
 	os.remove(outfile)
 	sys.exit(1)

