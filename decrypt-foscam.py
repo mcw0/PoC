@@ -91,7 +91,8 @@ if __name__ == "__main__":
 		39:'Ak47@99',	# l: factory~, p: Ak47@99 @ webService
 		40:'rizhi6789', # dd if=ipcLog.bin | openssl des3 -d -k rizhi6789 [...]
 		41:'foscam',	# l: admin, p: foscam @ UDTMediaServer
-		42:'WWzift*v4'  # 'F' model AKA R4, R2, C2
+		42:'WWzift*v4',  # 'F' model AKA R4, R2, C2
+		43:'WWjift*v2' # 'K' model (C2M)
 		}
 
 	CIPHER = {
