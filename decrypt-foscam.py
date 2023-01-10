@@ -93,7 +93,7 @@ if __name__ == "__main__":
 		41:'foscam',	# l: admin, p: foscam @ UDTMediaServer
 		42:'WWzift*v4', # 'F' model AKA R4, R2, C2
 		43:'WWjift*v2',  # 'K' model (C2M)
-        44:'WWZ7zy*v2', # 'J' model
+		44:'WWZ7zy*v2', # 'J' model
 		}
 
 	CIPHER = {
