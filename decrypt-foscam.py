@@ -23,7 +23,7 @@ if __name__ == "__main__":
 		arg_parser.add_argument('--outfile', required=False, help='Decrypted file')
 		args = arg_parser.parse_args()
 	except Exception as e:
-		print INFO,"\nError: %s\n" % str(e)
+		print(INFO,"\nError: %s\n" % str(e))
 		sys.exit(1)
 
 	if args.infile:
@@ -92,7 +92,8 @@ if __name__ == "__main__":
 		40:'rizhi6789', # dd if=ipcLog.bin | openssl des3 -d -k rizhi6789 [...]
 		41:'foscam',	# l: admin, p: foscam @ UDTMediaServer
 		42:'WWzift*v4', # 'F' model AKA R4, R2, C2
-		43:'WWjift*v2'  # 'K' model (C2M)
+		43:'WWjift*v2',  # 'K' model (C2M)
+        44:'WWZ7zy*v2', # 'J' model
 		}
 
 	CIPHER = {
@@ -175,6 +176,10 @@ if __name__ == "__main__":
 #		11:'blake2b512'
 	}
 
+	if not os.path.exists(infile):
+		print("Input file not found")
+		sys.exit(1)
+
 	DECRYPTED = 0
 	for chipher in CIPHER.keys():
 		for digest in DIGEST.keys():
@@ -194,13 +199,15 @@ if __name__ == "__main__":
 					p = subprocess.Popen("gzip -t " + outfile + "", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 					p_stderr = p.stderr.read()
 					if not (p_stderr):
-						print "Decrypted with: {}".format(TEMP)
+						print("Decrypted with: {}".format(TEMP))
 						sys.exit(0)
 					else:
-						print "Decryption NOT OK: {}".format(TEMP)
-						os.remove(outfile)
+						print("Decryption NOT OK: {}".format(TEMP))
+						if os.path.exists(outfile):
+							os.remove(outfile)
 				else:
-					print p_stderr[0],
-	print "Cleaning up..."
-	os.remove(outfile)
+					print(p_stderr[0],)
+	print("Cleaning up...")
+	if os.path.exists(outfile):
+		os.remove(outfile)
 	sys.exit(1)
